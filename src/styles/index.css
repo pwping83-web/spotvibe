@@ -1,0 +1,24 @@
+@import './fonts.css';
+@import './tailwind.css';
+@import './theme.css';
+
+/* react-leaflet DivIcon: remove default white tile behind custom HTML pins */
+.leaflet-div-icon.spotvibe-leaflet-div-icon {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* AI 추천 핀 — 맥박 링 */
+@keyframes spotvibe-ping {
+  0%   { box-shadow: 0 0 0 0 rgba(255,255,255,0.55), 0 0 0 0 rgba(255,255,255,0.22); }
+  60%  { box-shadow: 0 0 0 14px rgba(255,255,255,0), 0 0 0 28px rgba(255,255,255,0); }
+  100% { box-shadow: 0 0 0 0 rgba(255,255,255,0), 0 0 0 0 rgba(255,255,255,0); }
+}
+
+/* LoginPage 애니메이션은 motion/react(JS)로 처리 — 별도 CSS 키프레임 없음 */
+
+@media (prefers-reduced-motion: reduce) {
+  .spotvibe-login-sparkle {
+    animation: none;
+  }
+}
