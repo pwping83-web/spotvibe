@@ -223,6 +223,18 @@ const TILE_ATTRIBUTION =
 
 const KAKAO_MAP_JS_KEY = import.meta.env.VITE_KAKAO_MAP_JS_KEY?.trim() ?? '';
 
+/** 카카오 대신 Carto 다크 타일만 쓰기(로컬 저장, 카카오 키가 있을 때만 토글 표시) */
+const SPOTVIBE_PREFER_DARK_MAP_BASE_KEY = 'spotvibe-prefer-dark-map-base';
+
+function readPreferDarkMapBase(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    return window.localStorage.getItem(SPOTVIBE_PREFER_DARK_MAP_BASE_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
 /** 카카오 로드맵은 공식 다크 타입이 없음 → 컨테이너에 CSS filter로 앱 다크 톤에 맞춤 */
 const KAKAO_MAP_DEFAULT_CSS_FILTER = 'brightness(0.72) contrast(1.1) saturate(0.9)';
 
@@ -1463,8 +1475,21 @@ export function MapArea({
   const kakaoMapRef = useRef<KakaoMapInstance | null>(null);
   const suppressKakaoEchoRef = useRef(0);
   const [leafletMapForSync, setLeafletMapForSync] = useState<L.Map | null>(null);
+  const [preferDarkMapBase, setPreferDarkMapBase] = useState(readPreferDarkMapBase);
 
-  const useKakaoBase = kakaoStage === 'ready' && kakaoBootstrapped;
+  const togglePreferDarkMapBase = useCallback(() => {
+    setPreferDarkMapBase((prev) => {
+      const next = !prev;
+      try {
+        window.localStorage.setItem(SPOTVIBE_PREFER_DARK_MAP_BASE_KEY, next ? '1' : '0');
+      } catch {
+        /* noop */
+      }
+      return next;
+    });
+  }, []);
+
+  const useKakaoBase = kakaoStage === 'ready' && kakaoBootstrapped && !preferDarkMapBase;
   const mapReady = kakaoStage !== 'loading';
   /** 지도에서 탭해 고른 탐색 중심(히트맵·클러스터·이벤트 핀 기준) */
   const [exploreCenter, setExploreCenter] = useState<[number, number]>(() => exploreAnchor);
@@ -2284,8 +2309,14 @@ export function MapArea({
     };
   }, []);
 
+  useEffect(() => {
+    if (!preferDarkMapBase) return;
+    kakaoMapRef.current = null;
+    setKakaoBootstrapped(false);
+  }, [preferDarkMapBase]);
+
   useLayoutEffect(() => {
-    if (kakaoStage !== 'ready') return;
+    if (kakaoStage !== 'ready' || preferDarkMapBase) return;
     const el = kakaoHostRef.current;
     if (!el || kakaoMapRef.current || !window.kakao?.maps?.Map) return;
     const { LatLng, Map: KakaoMap } = window.kakao.maps;
@@ -2297,8 +2328,8 @@ export function MapArea({
     map.setMaxLevel(11);
     kakaoMapRef.current = map;
     setKakaoBootstrapped(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- 카카오 Map 인스턴스는 1회만 생성(exploreCenter는 Leaflet·동기화로 이후 반영)
-  }, [kakaoStage]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- 카카오 Map 인스턴스는 호스트 표시 시 1회 생성(exploreCenter는 Leaflet·동기화로 이후 반영)
+  }, [kakaoStage, preferDarkMapBase]);
 
   useEffect(() => {
     if (!useKakaoBase) return;
@@ -2396,7 +2427,7 @@ export function MapArea({
           : '[&_.leaflet-bottom.leaflet-left]:mb-[7.25rem]',
       )}
     >
-      {kakaoStage === 'ready' && (
+      {useKakaoBase && (
         <div
           ref={kakaoHostRef}
           className="pointer-events-auto absolute inset-0 z-0"
@@ -3077,6 +3108,22 @@ export function MapArea({
               explorePresets={EXPLORE_REGION_PRESETS}
               onApply={applyExploreFromSearch}
             />
+            {!!KAKAO_MAP_JS_KEY && (
+              <div className="flex justify-end pt-0.5">
+                <button
+                  type="button"
+                  onClick={togglePreferDarkMapBase}
+                  title={
+                    preferDarkMapBase
+                      ? 'Carto 다크 지도 — 탭하면 카카오 로드맵(디밍)으로'
+                      : '카카오 로드맵 — 탭하면 Carto 다크 지도로'
+                  }
+                  className="rounded-xl border border-white/12 bg-[#0A0A0E]/88 px-2.5 py-1.5 text-[10px] font-semibold text-white/55 shadow-md backdrop-blur-md transition-colors hover:border-[#00F0FF]/30 hover:text-[#00F0FF]/90 active:scale-[0.99]"
+                >
+                  {preferDarkMapBase ? '배경 Carto' : '배경 카카오'}
+                </button>
+              </div>
+            )}
             </div>
         </div>
 

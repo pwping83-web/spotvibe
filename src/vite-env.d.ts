@@ -22,8 +22,7 @@ interface ImportMetaEnv {
   /** 카카오맵 JavaScript 키 — 미설정 시 배경은 Carto/OSM 타일(기존) */
   readonly VITE_KAKAO_MAP_JS_KEY?: string;
   /**
-   * 카카오 로드맵 타일 톤(CSS filter). 공식 다크 지도 타입이 없어 기본은 어둡게 보정.
-   * 예: brightness(0.72) contrast(1.1) saturate(0.9) | 비우면 기본값 | none 이면 필터 없음
+   * (선택) 카카오 지도 컨테이너에만 CSS `filter` 적용. 미설정·`none`이면 필터 없음(밝은 로드맵 유지).
    */
   readonly VITE_KAKAO_MAP_CSS_FILTER?: string;
   /** test | real — 미설정 시 test */
