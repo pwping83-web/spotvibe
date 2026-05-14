@@ -223,6 +223,18 @@ const TILE_ATTRIBUTION =
 
 const KAKAO_MAP_JS_KEY = import.meta.env.VITE_KAKAO_MAP_JS_KEY?.trim() ?? '';
 
+/** 카카오 로드맵은 공식 다크 타입이 없음 → 컨테이너에 CSS filter로 앱 다크 톤에 맞춤 */
+const KAKAO_MAP_DEFAULT_CSS_FILTER = 'brightness(0.72) contrast(1.1) saturate(0.9)';
+
+function kakaoMapHostStyle(): React.CSSProperties {
+  const base: React.CSSProperties = { width: '100%', height: '100%' };
+  if (!KAKAO_MAP_JS_KEY) return base;
+  const raw = import.meta.env.VITE_KAKAO_MAP_CSS_FILTER?.trim();
+  if (raw === 'none') return base;
+  const filter = raw && raw.length > 0 ? raw : KAKAO_MAP_DEFAULT_CSS_FILTER;
+  return { ...base, filter };
+}
+
 function syncKakaoViewFromLeaflet(
   kakaoMapRef: React.MutableRefObject<KakaoMapInstance | null>,
   suppressEchoRef: React.MutableRefObject<number>,
@@ -2388,7 +2400,7 @@ export function MapArea({
         <div
           ref={kakaoHostRef}
           className="pointer-events-auto absolute inset-0 z-0"
-          style={{ width: '100%', height: '100%' }}
+          style={kakaoMapHostStyle()}
           aria-hidden
         />
       )}
