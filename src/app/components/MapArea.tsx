@@ -1,4 +1,4 @@
-﻿import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+﻿import React, { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   Circle,
   CircleMarker,
@@ -60,6 +60,12 @@ import type { SosSignal, SosTypeMeta } from '@/types/sos';
 import { getSosTypeMeta, sosOpacity } from '@/types/sos';
 import { haversineMeters } from '@/lib/geoDistance';
 import { ViNeighborSendSheet } from './ViNeighborSendSheet';
+import {
+  kakaoLevelToLeafletZoom,
+  leafletZoomToKakaoLevel,
+  loadKakaoMapsScript,
+} from '@/lib/kakaoMapsLoader';
+import type { KakaoMapInstance } from '@/types/kakao.maps';
 
 /** 취약계층 마커 근접 시 이웃 단말 짧은 알림음(웹 오디오) */
 function playViProximityAlertTone() {
@@ -86,8 +92,8 @@ function playViProximityAlertTone() {
 }
 
 /**
- * 내 위치: 현재는 브라우저 Geolocation + Leaflet.
- * TODO(Kakao): Kakao Maps SDK / kakao.maps.services.Geocoder 등으로 교체·정확도·백그라운드 정책 맞추기.
+ * 내 위치: 브라우저 Geolocation + Leaflet 오버레이.
+ * 배경 지도: `VITE_KAKAO_MAP_JS_KEY`가 있으면 카카오맵(JavaScript API) 래스터 + Leaflet은 타일 없이 마커·벡터만(동기화).
  */
 
 interface MapAreaProps {
@@ -214,6 +220,27 @@ const TILE_DARK_MATTER =
   'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
 const TILE_ATTRIBUTION =
   '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
+
+const KAKAO_MAP_JS_KEY = import.meta.env.VITE_KAKAO_MAP_JS_KEY?.trim() ?? '';
+
+function syncKakaoViewFromLeaflet(
+  kakaoMapRef: React.MutableRefObject<KakaoMapInstance | null>,
+  suppressEchoRef: React.MutableRefObject<number>,
+  center: [number, number],
+  leafletZoom: number,
+) {
+  const km = kakaoMapRef.current;
+  if (!km || !window.kakao?.maps?.LatLng) return;
+  suppressEchoRef.current += 1;
+  try {
+    km.setCenter(new window.kakao.maps.LatLng(center[0], center[1]));
+    km.setLevel(leafletZoomToKakaoLevel(leafletZoom), { animate: false });
+  } finally {
+    queueMicrotask(() => {
+      suppressEchoRef.current -= 1;
+    });
+  }
+}
 
 /** 지도 연령층(20·30·40대) — 마이와 동일 팔레트 */
 const M20 = mapBracketPalette('20대');
@@ -446,13 +473,18 @@ function followZoomForViewport(map: L.Map, preferred: number): number {
 }
 
 /** Flex·반응형·DevTools 기기 전환 시 Leaflet이 컨테이너 크기를 놓치는 경우 보정 */
-function MapInvalidateOnResize() {
+function MapInvalidateOnResize({
+  kakaoMapRef,
+}: {
+  kakaoMapRef?: React.MutableRefObject<KakaoMapInstance | null>;
+}) {
   const map = useMap();
 
   useEffect(() => {
     const el = map.getContainer();
     const bump = () => {
       map.invalidateSize({ animate: false, pan: false });
+      kakaoMapRef?.current?.relayout();
     };
     const onWin = () => {
       requestAnimationFrame(bump);
@@ -475,7 +507,7 @@ function MapInvalidateOnResize() {
       window.removeEventListener('orientationchange', onWin);
       ro?.disconnect();
     };
-  }, [map]);
+  }, [map, kakaoMapRef]);
 
   return null;
 }
@@ -490,11 +522,15 @@ function MapSyncToMyLocation({
   center,
   zoom,
   followEnabled,
+  kakaoMapRef,
+  suppressKakaoEchoRef,
 }: {
   center: [number, number] | null;
   zoom: number;
   /** liveTracking && locationMode === 'my_location' */
   followEnabled: boolean;
+  kakaoMapRef?: React.MutableRefObject<KakaoMapInstance | null>;
+  suppressKakaoEchoRef?: React.MutableRefObject<number>;
 }) {
   const map = useMap();
   const flewRef = useRef(false);
@@ -520,6 +556,9 @@ function MapSyncToMyLocation({
       lastCenterRef.current = center;
       fixTiles();
       requestAnimationFrame(fixTiles);
+      if (kakaoMapRef && suppressKakaoEchoRef) {
+        syncKakaoViewFromLeaflet(kakaoMapRef, suppressKakaoEchoRef, center, z);
+      }
       return;
     }
 
@@ -540,9 +579,17 @@ function MapSyncToMyLocation({
     if ((coordsMoved && last) || (!coordsMoved && mapOffUserM > 45)) {
       map.panTo(center, { animate: true, duration: 0.38, easeLinearity: 0.22 });
       fixTiles();
+      if (kakaoMapRef && suppressKakaoEchoRef) {
+        syncKakaoViewFromLeaflet(
+          kakaoMapRef,
+          suppressKakaoEchoRef,
+          center,
+          map.getZoom(),
+        );
+      }
     }
     lastCenterRef.current = center;
-  }, [center, followEnabled, map, zoom]);
+  }, [center, followEnabled, map, zoom, kakaoMapRef, suppressKakaoEchoRef]);
 
   return null;
 }
@@ -551,9 +598,13 @@ function MapSyncToMyLocation({
 function MapFlyToExploreOnPick({
   center,
   pickVersion,
+  kakaoMapRef,
+  suppressKakaoEchoRef,
 }: {
   center: [number, number];
   pickVersion: number;
+  kakaoMapRef?: React.MutableRefObject<KakaoMapInstance | null>;
+  suppressKakaoEchoRef?: React.MutableRefObject<number>;
 }) {
   const map = useMap();
   useEffect(() => {
@@ -567,7 +618,22 @@ function MapFlyToExploreOnPick({
     };
     fixTiles();
     requestAnimationFrame(fixTiles);
-  }, [pickVersion, center, map]);
+    if (kakaoMapRef && suppressKakaoEchoRef) {
+      syncKakaoViewFromLeaflet(kakaoMapRef, suppressKakaoEchoRef, center, safeZ);
+    }
+  }, [pickVersion, center, map, kakaoMapRef, suppressKakaoEchoRef]);
+  return null;
+}
+
+/** Leaflet Map 인스턴스를 부모에 넘겨 카카오맵과 동기화 */
+function CaptureLeafletMap({ onMap }: { onMap: (m: L.Map | null) => void }) {
+  const map = useMap();
+  useEffect(() => {
+    onMap(map);
+    return () => {
+      onMap(null);
+    };
+  }, [map, onMap]);
   return null;
 }
 
@@ -1377,7 +1443,17 @@ export function MapArea({
     [bloodTypeSet, mbtiSet, activityTags],
   );
   const [zoomLevel, setZoomLevel] = useState(INITIAL_ZOOM);
-  const [mapReady, setMapReady] = useState(false);
+  const [kakaoStage, setKakaoStage] = useState<'unused' | 'loading' | 'ready' | 'failed'>(() =>
+    KAKAO_MAP_JS_KEY ? 'loading' : 'unused',
+  );
+  const [kakaoBootstrapped, setKakaoBootstrapped] = useState(false);
+  const kakaoHostRef = useRef<HTMLDivElement | null>(null);
+  const kakaoMapRef = useRef<KakaoMapInstance | null>(null);
+  const suppressKakaoEchoRef = useRef(0);
+  const [leafletMapForSync, setLeafletMapForSync] = useState<L.Map | null>(null);
+
+  const useKakaoBase = kakaoStage === 'ready' && kakaoBootstrapped;
+  const mapReady = kakaoStage !== 'loading';
   /** 지도에서 탭해 고른 탐색 중심(히트맵·클러스터·이벤트 핀 기준) */
   const [exploreCenter, setExploreCenter] = useState<[number, number]>(() => exploreAnchor);
   /** 좌하단 지역 프리셋 칩 — 기본 접힘, 버튼으로만 펼침 */
@@ -2181,11 +2257,64 @@ export function MapArea({
   }, [activeRec, recAnchor]);
 
   useEffect(() => {
-    setMapReady(true);
+    if (!KAKAO_MAP_JS_KEY) return;
+    let cancelled = false;
+    loadKakaoMapsScript(KAKAO_MAP_JS_KEY)
+      .then(() => {
+        if (!cancelled) setKakaoStage('ready');
+      })
+      .catch((e) => {
+        console.error('[SpotVibe] Kakao Maps script load failed:', e);
+        if (!cancelled) setKakaoStage('failed');
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  useLayoutEffect(() => {
+    if (kakaoStage !== 'ready') return;
+    const el = kakaoHostRef.current;
+    if (!el || kakaoMapRef.current || !window.kakao?.maps?.Map) return;
+    const { LatLng, Map: KakaoMap } = window.kakao.maps;
+    const map = new KakaoMap(el, {
+      center: new LatLng(exploreCenter[0], exploreCenter[1]),
+      level: leafletZoomToKakaoLevel(INITIAL_ZOOM),
+    });
+    map.setMinLevel(4);
+    map.setMaxLevel(11);
+    kakaoMapRef.current = map;
+    setKakaoBootstrapped(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- 카카오 Map 인스턴스는 1회만 생성(exploreCenter는 Leaflet·동기화로 이후 반영)
+  }, [kakaoStage]);
+
+  useEffect(() => {
+    if (!useKakaoBase) return;
+    const kMap = kakaoMapRef.current;
+    const lMap = leafletMapForSync;
+    if (!kMap || !lMap) return;
+
+    const syncLeafletFromKakao = () => {
+      if (suppressKakaoEchoRef.current > 0) return;
+      const c = kMap.getCenter();
+      const z = kakaoLevelToLeafletZoom(kMap.getLevel());
+      lMap.setView([c.getLat(), c.getLng()], z, { animate: false });
+    };
+
+    window.kakao.maps.event.addListener(kMap, 'dragend', syncLeafletFromKakao);
+    window.kakao.maps.event.addListener(kMap, 'zoom_changed', syncLeafletFromKakao);
+    return () => {
+      window.kakao.maps.event.removeListener(kMap, 'dragend', syncLeafletFromKakao);
+      window.kakao.maps.event.removeListener(kMap, 'zoom_changed', syncLeafletFromKakao);
+    };
+  }, [useKakaoBase, leafletMapForSync]);
 
   const handleZoomChange = useCallback((z: number) => {
     setZoomLevel(z);
+  }, []);
+
+  const handleLeafletCaptured = useCallback((m: L.Map | null) => {
+    setLeafletMapForSync(m);
   }, []);
 
   const points20 = useMemo(
@@ -2238,7 +2367,7 @@ export function MapArea({
   if (!mapReady) {
     return (
       <div className="absolute inset-0 z-0 flex items-center justify-center bg-[#12121A] text-white/40 text-sm">
-        지도 로딩…
+        {KAKAO_MAP_JS_KEY ? '카카오맵 불러오는 중…' : '지도 로딩…'}
       </div>
     );
   }
@@ -2246,37 +2375,56 @@ export function MapArea({
   return (
     <div
       className={cn(
-        'absolute inset-0 z-0 bg-[#12121A] [&_.leaflet-container]:h-full [&_.leaflet-container]:w-full [&_.leaflet-container]:bg-[#0A0A0E] [&_.leaflet-bottom.leaflet-left]:ml-2 [&_.leaflet-control-zoom]:overflow-hidden [&_.leaflet-control-zoom]:rounded-xl [&_.leaflet-control-zoom]:border [&_.leaflet-control-zoom]:border-white/12 [&_.leaflet-control-zoom]:bg-[#1A1A24]/95 [&_.leaflet-control-zoom]:shadow-lg [&_.leaflet-control-zoom-in]:text-white [&_.leaflet-control-zoom-out]:text-white [&_.leaflet-control-zoom-in]:leading-none [&_.leaflet-control-zoom-out]:leading-none [&_.leaflet-control-zoom-in:hover]:bg-white/10 [&_.leaflet-control-zoom-out:hover]:bg-white/10 [&_.leaflet-control-attribution]:max-w-[55%] [&_.leaflet-control-attribution]:truncate [&_.leaflet-control-attribution]:text-[9px] [&_.leaflet-control-attribution]:text-white/40 [&_.leaflet-control-attribution]:bg-black/40',
+        'absolute inset-0 z-0 bg-[#12121A] [&_.leaflet-container]:h-full [&_.leaflet-container]:w-full [&_.leaflet-bottom.leaflet-left]:ml-2 [&_.leaflet-control-zoom]:overflow-hidden [&_.leaflet-control-zoom]:rounded-xl [&_.leaflet-control-zoom]:border [&_.leaflet-control-zoom]:border-white/12 [&_.leaflet-control-zoom]:bg-[#1A1A24]/95 [&_.leaflet-control-zoom]:shadow-lg [&_.leaflet-control-zoom-in]:text-white [&_.leaflet-control-zoom-out]:text-white [&_.leaflet-control-zoom-in]:leading-none [&_.leaflet-control-zoom-out]:leading-none [&_.leaflet-control-zoom-in:hover]:bg-white/10 [&_.leaflet-control-zoom-out:hover]:bg-white/10 [&_.leaflet-control-attribution]:max-w-[55%] [&_.leaflet-control-attribution]:truncate [&_.leaflet-control-attribution]:text-[9px] [&_.leaflet-control-attribution]:text-white/40 [&_.leaflet-control-attribution]:bg-black/40',
+        useKakaoBase
+          ? '[&_.leaflet-container]:!bg-transparent [&_.leaflet-tile-pane]:hidden [&_.leaflet-container]:pointer-events-none [&_.leaflet-marker-pane]:pointer-events-auto [&_.leaflet-overlay-pane]:pointer-events-auto [&_.leaflet-popup-pane]:pointer-events-auto'
+          : '[&_.leaflet-container]:bg-[#0A0A0E]',
         mapMinimalChrome
           ? '[&_.leaflet-bottom.leaflet-left]:mb-2'
           : '[&_.leaflet-bottom.leaflet-left]:mb-[7.25rem]',
       )}
     >
+      {kakaoStage === 'ready' && (
+        <div
+          ref={kakaoHostRef}
+          className="pointer-events-auto absolute inset-0 z-0"
+          style={{ width: '100%', height: '100%' }}
+          aria-hidden
+        />
+      )}
       <MapContainer
         center={exploreCenter}
         zoom={INITIAL_ZOOM}
         minZoom={11}
         maxZoom={18}
-        scrollWheelZoom
-        dragging
-        doubleClickZoom
-        touchZoom
+        scrollWheelZoom={!useKakaoBase}
+        dragging={!useKakaoBase}
+        doubleClickZoom={!useKakaoBase}
+        touchZoom={!useKakaoBase}
         zoomControl={false}
         /** DivIcon+CSS transform 링이 줌 보간과 겹칠 때 깜빡임 완화 */
         markerZoomAnimation={false}
-        className="h-full w-full"
-        style={{ background: '#0A0A0E' }}
+        className={cn('h-full w-full', useKakaoBase && 'absolute inset-0 z-10')}
+        style={{ background: useKakaoBase ? 'transparent' : '#0A0A0E' }}
       >
-        <TileLayer attribution={TILE_ATTRIBUTION} url={TILE_DARK_MATTER} />
-        <MapInvalidateOnResize />
+        {!useKakaoBase && <TileLayer attribution={TILE_ATTRIBUTION} url={TILE_DARK_MATTER} />}
+        <MapInvalidateOnResize kakaoMapRef={useKakaoBase ? kakaoMapRef : undefined} />
+        <CaptureLeafletMap onMap={handleLeafletCaptured} />
         {/* 상단 SpotVibe 헤더·+/- 겹침 방지: 줌은 좌하단 + 탭바 여백 */}
         <ZoomLevelTracker onZoomChange={handleZoomChange} />
         <MapSyncToMyLocation
           center={mapDisplayMyLocation}
           zoom={16}
           followEnabled={liveTracking && locationMode === 'my_location'}
+          kakaoMapRef={useKakaoBase ? kakaoMapRef : undefined}
+          suppressKakaoEchoRef={useKakaoBase ? suppressKakaoEchoRef : undefined}
         />
-        <MapFlyToExploreOnPick center={exploreCenter} pickVersion={regionPickVersion} />
+        <MapFlyToExploreOnPick
+          center={exploreCenter}
+          pickVersion={regionPickVersion}
+          kakaoMapRef={useKakaoBase ? kakaoMapRef : undefined}
+          suppressKakaoEchoRef={useKakaoBase ? suppressKakaoEchoRef : undefined}
+        />
 
         {/* MBTI 집합 오버레이 — 테스트 모드만 (가상 필터 시각화) */}
         {simOn && mbtiSet && mbtiSet.size > 0 && Array.from(mbtiSet).map((type) => {

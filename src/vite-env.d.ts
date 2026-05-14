@@ -19,6 +19,8 @@ interface ImportMetaEnv {
   readonly VITE_BUSINESS_PHONE?: string;
   readonly VITE_BUSINESS_EMAIL?: string;
   readonly VITE_BUSINESS_ECOMMERCE_REPORT_NUMBER?: string;
+  /** 카카오맵 JavaScript 키 — 미설정 시 배경은 Carto/OSM 타일(기존) */
+  readonly VITE_KAKAO_MAP_JS_KEY?: string;
   /** test | real — 미설정 시 test */
   readonly VITE_SPOTVIBE_DATA_MODE?: string;
   readonly VITE_GROQ_API_KEY?: string;
