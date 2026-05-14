@@ -1,0 +1,52 @@
+{
+  "iris": {
+    "listUrl": "https://www.iris.go.kr/contents/retrieveBsnsAncmBtinSituListView.do",
+    "tab": "접수중",
+    "maxPages": 8,
+    "enrichDetailDates": true,
+    "detailLimit": 30,
+    "enrichAllMatched": true,
+    "keywords": [
+      "재난안전",
+      "재난",
+      "안전관리",
+      "디딤돌",
+      "창업성장",
+      "스마트시티",
+      "치안",
+      "폴리스랩",
+      "소방",
+      "LBS",
+      "디지털 안전",
+      "시민안전",
+      "생활안전",
+      "위치기반",
+      "실증"
+    ]
+  },
+  "smes": {
+    "enabled": true,
+    "baseUrl": "https://www.smes.go.kr/fnct/apiReqst/extPblancInfo",
+    "authQueryKey": "token",
+    "dateRangeDays": 90,
+    "html": "no",
+    "extraQuery": {}
+  },
+  "ntis": {
+    "enabled": true,
+    "listUrl": "https://www.ntis.go.kr/rndgate/eg/un/ra/mng.do",
+    "maxPages": 6,
+    "ministryOrKeyword": true,
+    "ministries": [
+      "행정안전부",
+      "중소벤처기업부",
+      "소방청",
+      "경찰청",
+      "국토교통부"
+    ]
+  },
+  "excludePastDeadline": true,
+  "dropUnparsedDeadline": false,
+  "outputDir": "artifacts/grant-watch",
+  "ddayAlerts": [14, 7, 3, 1, 0]
+}

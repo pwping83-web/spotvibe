@@ -17,9 +17,16 @@ function figmaAssetResolver() {
 }
 
 export default defineConfig({
+  /** Vercel 등 배포 시 클라이언트 라우트(/privacy, /signup)용 SPA 빌드 */
+  appType: 'spa',
   server: {
     /** `npm run dev` 시 기본 브라우저에서 로컬 URL 자동 오픈 */
     open: true,
+    /** 같은 Wi‑Fi의 폰에서 접속하려면 true (PC에서는 localhost, 폰은 http://PC내부IP:5199) */
+    host: true,
+    /** 로컬 고정 — Supabase Redirect URLs에 동일 포트 등록 필요 */
+    port: 5199,
+    strictPort: true,
   },
   plugins: [
     figmaAssetResolver(),

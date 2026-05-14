@@ -1,8 +1,7 @@
 /**
- * 운영·문의 수신 메일.
- * 실제 서비스 배포 시 운영 도메인 메일로 교체하세요.
+ * 운영·문의 수신 메일 (mailto·평문 푸터에 사용).
  */
-export const SPOTVIBE_INQUIRY_EMAIL = 'hello@spotvibe.app';
+export const SPOTVIBE_INQUIRY_EMAIL = 'wespdd@gmail.com';
 
 export type InquiryKind = 'improvement' | 'ad' | 'event' | 'other';
 
@@ -65,7 +64,7 @@ export function buildInquiryMailto(params: {
     '',
     '---',
     `문의 유형: ${meta.label}`,
-    params.replyEmail.trim() ? `회신 메일: ${params.replyEmail.trim()}` : '회신 메일: (작성 안 함)',
+    params.replyEmail.trim() ? `답장을 받으실 메일: ${params.replyEmail.trim()}` : '답장을 받으실 메일: (작성 안 함)',
     `발송 시각(기기): ${new Date().toISOString()}`,
   ].join('\n');
   const fullBody = `${params.body.trim()}\n${footer}`;
@@ -85,7 +84,7 @@ export function buildInquiryPlainText(params: {
     '',
     '---',
     `문의 유형: ${meta.label}`,
-    params.replyEmail.trim() ? `회신 메일: ${params.replyEmail.trim()}` : '회신 메일: (작성 안 함)',
+    params.replyEmail.trim() ? `답장을 받으실 메일: ${params.replyEmail.trim()}` : '답장을 받으실 메일: (작성 안 함)',
     `수신: ${SPOTVIBE_INQUIRY_EMAIL}`,
   ].join('\n');
   return `제목: ${subject}\n\n${params.body.trim()}\n${footer}`;

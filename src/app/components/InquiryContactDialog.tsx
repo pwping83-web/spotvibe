@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Mail, Copy, Check, Megaphone, Sparkles, PartyPopper, HelpCircle } from 'lucide-react';
+import { Mail, Megaphone, Sparkles, PartyPopper, HelpCircle, Send } from 'lucide-react';
+import { toast } from 'sonner';
+import { isEmailJsInquiryConfigured, sendInquiryViaEmailJs } from '@/lib/inquiryEmailjs';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from './ui/dialog';
 import {
-  SPOTVIBE_INQUIRY_EMAIL,
   type InquiryKind,
   INQUIRY_KIND_META,
   buildInquiryMailto,
-  buildInquiryPlainText,
   appendLocalInquiryLog,
 } from '../constants/inquiry';
 
@@ -36,46 +35,59 @@ export function InquiryContactDialog({ open, onOpenChange, initialKind = 'improv
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [replyEmail, setReplyEmail] = useState('');
-  const [copied, setCopied] = useState(false);
+  const [sending, setSending] = useState(false);
+
+  const emailJsReady = isEmailJsInquiryConfigured();
 
   useEffect(() => {
     if (open) {
       setKind(initialKind);
-      setCopied(false);
+      setSending(false);
     }
   }, [open, initialKind]);
 
   const meta = INQUIRY_KIND_META[kind];
-  const plain = buildInquiryPlainText({ kind, title, body, replyEmail });
   const mailto = buildInquiryMailto({ kind, title, body, replyEmail });
-  const canSend = body.trim().length >= 8;
+  const bodyLen = body.trim().length;
+  const minBodyLen = 8;
+  const canSend = bodyLen >= minBodyLen;
   const mailtoTooLong = mailto.length > 1900;
+  const sendBlockedHint = `내용을 ${minBodyLen}자 이상 입력하면 보내기를 사용할 수 있어요. (현재 ${bodyLen}자)`;
 
-  const handleOpenMail = () => {
-    if (!canSend) return;
+  const mailtoHref = canSend && !mailtoTooLong ? mailto : '';
+
+  const logInquiryOpen = () => {
     appendLocalInquiryLog({
       at: Date.now(),
       kind,
       title: title.trim() || meta.label,
       excerpt: body.trim().slice(0, 120),
     });
-    window.location.href = mailto;
   };
 
-  const handleCopy = async () => {
-    if (!canSend) return;
+  const handleSendEmailJs = async () => {
+    if (!canSend || !emailJsReady || sending) return;
+    setSending(true);
     try {
-      await navigator.clipboard.writeText(plain);
+      await sendInquiryViaEmailJs({ kind, title, body, replyEmail });
       appendLocalInquiryLog({
         at: Date.now(),
         kind,
         title: title.trim() || meta.label,
         excerpt: body.trim().slice(0, 120),
       });
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      setCopied(false);
+      toast.success('문의를 보냈어요. 검토 후 연락드릴 수 있어요.');
+      onOpenChange(false);
+      setTitle('');
+      setBody('');
+      setReplyEmail('');
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      toast.error('전송에 실패했어요. 잠시 후 다시 시도해 주세요.', {
+        description: msg.length > 120 ? `${msg.slice(0, 120)}…` : msg,
+      });
+    } finally {
+      setSending(false);
     }
   };
 
@@ -87,9 +99,6 @@ export function InquiryContactDialog({ open, onOpenChange, initialKind = 'improv
             <DialogTitle className="text-[17px] font-bold tracking-tight text-white">
               운영 · 문의
             </DialogTitle>
-            <DialogDescription className="text-[12px] leading-relaxed text-white/45">
-              개선 의견·광고·행사 문의를 남기면 검토 후 서비스에 반영하거나 메일로 답변드릴 수 있어요. 아래 내용이 메일 앱으로 전달됩니다.
-            </DialogDescription>
           </DialogHeader>
         </div>
 
@@ -150,58 +159,100 @@ export function InquiryContactDialog({ open, onOpenChange, initialKind = 'improv
               placeholder="불편한 점, 원하시는 기능, 행사 일정·규모, 광고 희망 기간 등 구체적으로 적어 주세요."
               className="w-full resize-none rounded-xl border border-white/[0.1] bg-white/[0.04] px-3 py-2.5 text-[13px] leading-relaxed text-white outline-none placeholder:text-white/25 focus:border-[#00F0FF]/40"
             />
-            <p className="mt-1 text-[10px] text-white/28">최소 8자 이상 입력해 주세요.</p>
+            <p
+              className={`mt-1 text-[10px] ${bodyLen > 0 && bodyLen < minBodyLen ? 'font-medium text-[#FF6B6B]' : 'text-white/28'}`}
+            >
+              {bodyLen > 0 && bodyLen < minBodyLen
+                ? `내용은 ${minBodyLen}자 이상 입력해 주세요. (현재 ${bodyLen}자)`
+                : `최소 ${minBodyLen}자 이상 입력해 주세요.`}
+            </p>
           </div>
 
           <div>
             <label className="mb-1.5 block text-[11px] font-semibold text-white/50" htmlFor="inq-reply">
-              회신 받을 메일 <span className="font-normal text-white/30">(선택)</span>
+              답장을 받으실 메일 주소 <span className="font-normal text-white/30">(선택)</span>
             </label>
             <input
               id="inq-reply"
               type="email"
               value={replyEmail}
               onChange={(e) => setReplyEmail(e.target.value)}
-              placeholder="you@example.com"
+              placeholder="예: 본인 네이버·지메일 등"
               className="w-full rounded-xl border border-white/[0.1] bg-white/[0.04] px-3 py-2.5 text-[13px] text-white outline-none placeholder:text-white/25 focus:border-[#00F0FF]/40"
             />
+            {!emailJsReady && (
+              <p className="mt-1 text-[10px] leading-snug text-white/28">
+                비워 두면 메일 앱에 설정된 발신 주소로 이어질 수 있어요.
+              </p>
+            )}
           </div>
 
-          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2.5">
-            <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-white/28">수신 주소</p>
-            <p className="mt-0.5 font-mono text-[12px] text-[#FFDE00]/90">{SPOTVIBE_INQUIRY_EMAIL}</p>
-          </div>
-
-          {mailtoTooLong && (
+          {!emailJsReady && mailtoTooLong && (
             <p className="text-[11px] leading-snug text-[#FFDE00]/85">
-              내용이 길어 일부 메일 앱에서 열리지 않을 수 있어요.「전문 복사」로 붙여넣어 보내 주세요.
+              내용이 길어 메일 앱 링크가 열리지 않을 수 있어요. 본문을 나누어 짧게 적은 뒤 다시 시도해 주세요.
             </p>
           )}
 
           <div className="flex flex-col gap-2 pt-1">
-            <button
-              type="button"
-              disabled={!canSend || mailtoTooLong}
-              onClick={handleOpenMail}
-              className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#00F0FF]/35 bg-[#00F0FF]/12 py-3 text-[13px] font-bold text-[#00F0FF] transition-all active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              <Mail size={18} strokeWidth={2.2} />
-              메일 앱으로 보내기
-            </button>
-            <button
-              type="button"
-              disabled={!canSend}
-              onClick={handleCopy}
-              className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/12 bg-white/[0.04] py-3 text-[13px] font-semibold text-white/85 transition-all active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              {copied ? <Check size={18} className="text-[#4ADE80]" /> : <Copy size={18} />}
-              {copied ? '복사됨' : '제목·본문 한 번에 복사'}
-            </button>
+            {!emailJsReady && (
+              <p className="rounded-lg border border-amber-500/30 bg-amber-500/[0.08] px-3 py-2 text-[10px] leading-relaxed text-amber-100/88">
+                이 버튼은 <strong className="text-amber-50">기기 메일 앱</strong>만 엽니다. 사이트에서 바로내려면 Vercel Production에{' '}
+                <code className="rounded bg-black/35 px-1 font-mono text-[9px] text-amber-50/95">VITE_EMAILJS_PUBLIC_KEY</code>{' '}
+                <code className="rounded bg-black/35 px-1 font-mono text-[9px] text-amber-50/95">VITE_EMAILJS_SERVICE_ID</code>{' '}
+                <code className="rounded bg-black/35 px-1 font-mono text-[9px] text-amber-50/95">VITE_EMAILJS_TEMPLATE_ID</code>
+                를 넣고 <strong className="text-amber-50">재배포</strong>해야 합니다.
+              </p>
+            )}
+            {!canSend && bodyLen > 0 && (
+              <p className="rounded-xl border border-[#FF6B6B]/25 bg-[#FF6B6B]/08 px-3 py-2 text-center text-[11px] leading-snug text-[#FF6B6B]/95">
+                {sendBlockedHint}
+              </p>
+            )}
+            {emailJsReady && (
+              <button
+                type="button"
+                disabled={!canSend || sending}
+                title={!canSend ? sendBlockedHint : undefined}
+                onClick={() => void handleSendEmailJs()}
+                className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#00F0FF]/35 bg-[#00F0FF]/12 py-3 text-[13px] font-bold text-[#00F0FF] transition-all active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                <Send size={18} strokeWidth={2.2} />
+                {sending ? '보내는 중…' : '문의 보내기'}
+              </button>
+            )}
+            {!emailJsReady &&
+              (mailtoHref ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    logInquiryOpen();
+                    window.location.href = mailtoHref;
+                  }}
+                  className="relative z-[1] flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-[#00F0FF]/35 bg-[#00F0FF]/12 py-3 text-[13px] font-bold text-[#00F0FF] transition-all active:scale-[0.99] hover:bg-[#00F0FF]/18"
+                >
+                  <Mail size={18} strokeWidth={2.2} />
+                  메일 앱으로 보내기
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  title={!canSend ? sendBlockedHint : '본문이 너무 길면 메일 링크가 열리지 않을 수 있어요. 내용을 줄여 주세요.'}
+                  onClick={() => {
+                    if (!canSend) {
+                      toast.error(sendBlockedHint);
+                      return;
+                    }
+                    if (mailtoTooLong) {
+                      toast.error('제목·내용이 너무 길어 메일 링크로 열 수 없어요. 줄인 뒤 다시 시도해 주세요.');
+                    }
+                  }}
+                  className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-[#00F0FF]/35 bg-[#00F0FF]/12 py-3 text-[13px] font-bold text-[#00F0FF] opacity-45 transition-all active:scale-[0.99]"
+                >
+                  <Mail size={18} strokeWidth={2.2} />
+                  메일 앱으로 보내기
+                </button>
+              ))}
           </div>
-
-          <p className="pb-1 text-center text-[10px] leading-relaxed text-white/25">
-            접수된 개선 제안은 내부 백로그에 쌓이고, 우선순위에 따라 업데이트에 반영됩니다.
-          </p>
         </div>
       </DialogContent>
     </Dialog>

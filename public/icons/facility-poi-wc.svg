@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" aria-hidden="true">
+  <!-- Restroom pictogram: male (blue) | divider | female (orange) -->
+  <circle cx="13" cy="10.8" r="4" fill="#7dd3fc"/>
+  <path
+    d="M7.2 15.2h11.6l-2.2 6.6H9.4z"
+    fill="#7dd3fc"
+    stroke="#38bdf8"
+    stroke-width="0.6"
+    stroke-linejoin="round"
+  />
+  <rect x="10.25" y="21.2" width="5.5" height="15.2" rx="2.75" fill="#7dd3fc" stroke="#38bdf8" stroke-width="0.55"/>
+  <rect x="22.85" y="9" width="2.3" height="31" rx="1.15" fill="#57534e"/>
+  <circle cx="35" cy="10.8" r="4" fill="#fb923c"/>
+  <path
+    d="M32.4 15.2h5.2l6.4 8.6H26z"
+    fill="#fb923c"
+    stroke="#ea580c"
+    stroke-width="0.55"
+    stroke-linejoin="round"
+  />
+  <rect x="32.25" y="23.2" width="5.5" height="13.2" rx="2.75" fill="#fb923c" stroke="#ea580c" stroke-width="0.55"/>
+</svg>

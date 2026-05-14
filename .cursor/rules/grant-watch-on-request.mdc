@@ -1,0 +1,66 @@
+---
+description: 지원사업 공고 모니터링(grant-watch). IRIS·NTIS·중소벤처24 SMES 질문 시 이 규칙과 npm 스크립트를 안내한다.
+globs:
+  - "scripts/grant-watch/**"
+  - "artifacts/grant-watch/**"
+  - "문서/지원사업/**"
+  - ".env.example"
+---
+
+# Grant watch (SpotVibe)
+
+## 역할
+
+IRIS(접수중) + NTIS(선택) + 중소벤처24 SMES API를 돌려 키워드 매칭 공고를 모으고, 마감 필터 후 아래를 갱신한다.
+
+- `artifacts/grant-watch/grant-hub-last-run.json`
+- `문서/지원사업/99_공고-모니터링-최근결과.md`
+
+## 실행 방법 (Windows PowerShell, 저장소 루트 `d:\SpotVibe`)
+
+```powershell
+Set-Location d:\SpotVibe
+npm run grant:watch
+```
+
+- 캐시만 다시 읽기(네트워크 없음): `npm run grant:watch:cache`
+- NTIS 생략(빠른 확인): `$env:GRANT_WATCH_SKIP_NTIS='1'; npm run grant:watch`
+- SMES 생략: `$env:GRANT_WATCH_SKIP_SMES='1'; npm run grant:watch`
+
+## 필수 환경
+
+- 루트 **`.env`**에 `SMES_EXT_PBLANC_KEY=…` — 값은 중소벤처24 「공고정보 연계 API」가이드의 **`token`** (공공데이터 `serviceKey` 아님). 스크립트가 루트 `.env`를 자동 로드한다.
+- 키 없으면 SMES는 자동으로 꺼지고 IRIS/NTIS만 동작한다.
+
+## SMES가 400 나올 때 (코드 기준)
+
+- 엔드포인트: `https://www.smes.go.kr/fnct/apiReqst/extPblancInfo`
+- 쿼리: **`token`** + `strDt` / `endDt` (`yyyyMMdd`). 예전처럼 `serviceKey`, `pageNo`, `numOfRows` 쓰면 안 맞음.
+- 구현: `scripts/grant-watch/fetch-smes.mjs`, 설정: `scripts/grant-watch/config.json`의 `smes` (`authQueryKey: "token"`, `dateRangeDays`, `html` 등).
+- 가이드 결과코드 **14**는 IP 제한 — 로컬에서만 안 되면 기관/서버 IP 화이트리스트 이슈일 수 있음.
+
+## 설정 파일
+
+- `scripts/grant-watch/config.json` — IRIS 탭·페이지, NTIS, `smes`, 키워드 목록, 출력 경로.
+- 기본 템플릿: `scripts/grant-watch/config.default.json`
+
+## 진입점
+
+- `package.json` → `"grant:watch": "node scripts/grant-watch/run.mjs"`
+- 로직: `scripts/grant-watch/run.mjs` (IRIS → NTIS → SMES 순; SMES는 try/catch로 실패해도 전체는 계속).
+
+## 헷갈리지 말 것
+
+- 「민간공고목록」 vs `extPblancInfo`: 가이드 V2의 **`extPblancInfo` + `token`** 기준.
+- 증명서 일괄확인 API (`/api/certificates/...`, Bearer 헤더)는 공고 수집과 별개 — **grant-watch와 무관**.
+
+## 산출물
+
+- `artifacts/grant-watch/grant-hub-last-run.json`
+- `문서/지원사업/99_공고-모니터링-최근결과.md`
+
+## 다른 에이전트에게 넘길 때
+
+새 채팅 맨 위에 아래 한 줄을 덧붙인다.
+
+> 저장소는 `d:\SpotVibe`, 위 규칙대로 `grant:watch`를 돌리고 SMES는 `.env`의 `SMES_EXT_PBLANC_KEY`(token)를 확인한다.

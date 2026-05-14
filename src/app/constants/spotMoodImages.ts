@@ -12,7 +12,7 @@ export const SPOT_MOOD_IMAGES = {
   /** 팝업·상권 밀집 — 번화가 군중 */
   retailCrowd:
     'https://images.unsplash.com/photo-1523301343968-6a6ebf63c672?auto=format&fit=crop&w=900&q=80',
-  /** 야간·바·클럽 — 나이트라이프 군중 */
+  /** 저녁·바·라운지 — 클럽가 인파 (UI용 키명) */
   nightlife:
     'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=900&q=80',
   /** 러닝·야외 스포츠 — 마라톤/러닝 크루 인파 */

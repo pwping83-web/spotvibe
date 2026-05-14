@@ -4,7 +4,26 @@ node_modules
 # Build
 dist
 dist-ssr
+output
+
+# grant-watch 자동 수집 결과(로컬)
+artifacts/grant-watch/
+
+# 성장 펄스 로컬 상태·로그
+artifacts/growth-pulse/
+
+# 로컬 심사용 Playwright 세션 (토큰 포함 가능 — 커밋 금지)
+review-auth.json
+
+# 직접 찍은 심사용 스크린샷 (커밋 금지)
+review-input
 *.local
+
+# 로컬 전용 민감정보(사업자 등) — Git에 포함하지 않음
+.local/
+
+# 임시 추출 이미지
+.local-temp-br.png
 
 # Logs / cache
 logs
@@ -25,3 +44,8 @@ pnpm-debug.log*
 
 # OS
 Thumbs.db
+
+.vercel
+
+# Supabase local temp
+supabase/.temp

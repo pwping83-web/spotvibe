@@ -2,7 +2,7 @@
 # 사용: .\scripts\open-app.ps1
 #       npm run open:app -- 5174   (Vite가 다른 포트일 때)
 param()
-$port = if ($args.Count -ge 1 -and $args[0]) { $args[0] } else { '5173' }
+$port = if ($args.Count -ge 1 -and $args[0]) { $args[0] } else { '5199' }
 $url = "http://localhost:$port/"
 
 $encoded = [System.Uri]::EscapeDataString($url)

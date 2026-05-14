@@ -1,6 +1,9 @@
 import React from 'react';
+import { Link } from 'react-router';
 import { motion } from 'motion/react';
 import { Waves } from 'lucide-react';
+import { signInWithKakaoOAuth } from '@/lib/kakaoAuth';
+import { BusinessInfoSection } from './BusinessInfoSection';
 
 function KakaoSymbol({ className }: { className?: string }) {
   return (
@@ -15,10 +18,6 @@ function KakaoSymbol({ className }: { className?: string }) {
 
 export interface LoginPageProps {
   onLoginSuccess: () => void;
-}
-
-async function signInWithKakaoOAuth(): Promise<void> {
-  await Promise.resolve();
 }
 
 /**
@@ -143,7 +142,7 @@ function Particles() {
 }
 
 const FEATURES = [
-  { emoji: '📍', label: '실시간 지도', sub: '연령·핫스팟' },
+  { emoji: '📍', label: '실시간 지도', sub: '핫스팟·장소' },
   { emoji: '⚡', label: '이벤트', sub: '주변 행사' },
   { emoji: '🔔', label: '맞춤 알림', sub: '내 시간대' },
 ] as const;
@@ -233,15 +232,21 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
     if (pending) return;
     setPending(true);
     try {
-      await signInWithKakaoOAuth();
-      onLoginSuccess();
+      const result = await signInWithKakaoOAuth();
+      if (result === 'mock_ok') onLoginSuccess();
+      if (result === 'missing_config') {
+        window.alert(
+          '배포 사이트에 Supabase 설정이 없습니다.\n\nVercel → 프로젝트 → Settings → Environment Variables에\nVITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY 를 넣고\n다시 배포(Deploy)해 주세요.',
+        );
+        setPending(false);
+      }
     } catch {
       setPending(false);
     }
   };
 
   return (
-    <div className="relative flex h-full min-h-0 w-full flex-1 flex-col bg-[#0A0A0E] text-white">
+    <div className="relative flex h-full min-h-0 w-full flex-1 flex-col overflow-y-auto bg-[#0A0A0E] text-white">
       <FloatingOrbs />
       <Particles />
 
@@ -262,13 +267,21 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.38 }} className="text-center px-8">
             <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1 text-[11px] text-white/40">
               <Waves className="h-3 w-3 text-cyan-400/70" aria-hidden />
-              주변 핫스팟 · 실시간
+              위치 기반 · 실시간 · 내 주변
             </div>
-            <h1 className="text-[2.6rem] font-black tracking-[-0.02em] text-white" style={{ textShadow: '0 0 40px rgba(0,240,255,0.18)' }}>
-              스팟바이브
-            </h1>
+            {/* 브랜드명 + 한국어 태그라인 */}
+            <div className="flex flex-col items-center gap-1">
+              <h1
+                className="text-[2.6rem] font-black tracking-[-0.02em] text-white"
+                style={{ textShadow: '0 0 40px rgba(0,240,255,0.18)' }}
+              >
+                지금 여기
+              </h1>
+              <p className="text-[11px] font-semibold tracking-widest text-white/28">SpotVibe</p>
+            </div>
             <p className="mt-3 text-[13.5px] leading-relaxed text-white/42">
-              지금 이 동네, 가장 핫한 바이브를<br />지도와 이벤트로 한눈에
+              지금 내 주변 핫플 · 상권 · 이벤트를<br />
+              한눈에 — 도움이 필요한 이웃도 연결
             </p>
           </motion.div>
         </div>
@@ -326,9 +339,29 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
             <KakaoSymbol className="shrink-0" />
             {pending ? '연결 중…' : '카카오로 시작하기'}
           </button>
-          <p className="mt-3.5 text-center text-[10.5px] leading-relaxed text-white/25">
-            로그인 시 서비스 이용약관 및 개인정보 처리에 동의하게 됩니다.
+          <p className="mt-3 text-center text-[11px] text-white/30">
+            <Link to="/service" className="font-semibold text-cyan-400/60 underline underline-offset-2">
+              서비스 안내·이용 동선
+            </Link>
+            {' · '}
+            처음이신가요?{' '}
+            <Link to="/signup" className="font-semibold text-cyan-400/70 underline underline-offset-2">
+              회원가입
+            </Link>
           </p>
+          <p className="mt-2 text-center text-[10.5px] leading-relaxed text-white/25">
+            로그인 시{' '}
+            <Link to="/terms" className="text-cyan-400/50 underline underline-offset-2">
+              이용약관
+            </Link>
+            {' 및 '}
+            <Link to="/privacy" className="text-cyan-400/50 underline underline-offset-2">
+              개인정보 처리방침
+            </Link>
+            에 동의합니다.
+          </p>
+
+          <BusinessInfoSection variant="compact" tone="page" />
         </motion.div>
       </div>
     </div>
