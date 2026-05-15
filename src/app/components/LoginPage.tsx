@@ -339,27 +339,6 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
             <KakaoSymbol className="shrink-0" />
             {pending ? '연결 중…' : '카카오로 시작하기'}
           </button>
-          <p className="mt-3 text-center text-[11px] text-white/30">
-            <Link to="/service" className="font-semibold text-cyan-400/60 underline underline-offset-2">
-              서비스 안내·이용 동선
-            </Link>
-            {' · '}
-            처음이신가요?{' '}
-            <Link to="/signup" className="font-semibold text-cyan-400/70 underline underline-offset-2">
-              회원가입
-            </Link>
-          </p>
-          <p className="mt-2 text-center text-[10.5px] leading-relaxed text-white/25">
-            로그인 시{' '}
-            <Link to="/terms" className="text-cyan-400/50 underline underline-offset-2">
-              이용약관
-            </Link>
-            {' 및 '}
-            <Link to="/privacy" className="text-cyan-400/50 underline underline-offset-2">
-              개인정보 처리방침
-            </Link>
-            에 동의합니다.
-          </p>
 
           <BusinessInfoSection variant="compact" tone="page" />
         </motion.div>
