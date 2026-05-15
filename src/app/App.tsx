@@ -603,7 +603,7 @@ function SpotVibeMain() {
       if ('Notification' in window && Notification.permission === 'granted') {
         new Notification('🆘 SpotVibe — SOS 신호 발신 중', {
           body: '신호가 아직 켜져 있어요. 상황이 해결됐다면 앱에서 신호를 해제해 주세요.',
-          icon: '/favicon.ico',
+          icon: '/favicon.svg',
           tag: 'sos-active-reminder',
           renotify: true,
         });
