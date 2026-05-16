@@ -5,8 +5,8 @@
   --border-card: rgba(255, 255, 255, 0.08);
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
-  --phone-w: 70mm;
-  --phone-h: 118mm;
+  --phone-w: 62mm;
+  --phone-h: 92mm;
   --screen-stage: #030408;
   --accent: #a855f7;
   --accent-glow: rgba(168, 85, 247, 0.15);
@@ -189,7 +189,7 @@ body {
 
 .hero p,
 .hero .lead {
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--text-muted);
   line-height: 1.5;
   word-break: keep-all;
@@ -269,9 +269,9 @@ body {
 }
 
 .feature-card p {
-  font-size: 9.5px;
-  color: #7c8a9e;
-  line-height: 1.4;
+  font-size: 10px;
+  color: #94a3b8;
+  line-height: 1.45;
   word-break: keep-all;
 }
 
@@ -284,9 +284,9 @@ body {
   align-items: stretch;
   gap: 4mm;
   margin-bottom: 2mm;
-  flex: 1 1 0;
-  min-height: var(--phone-h);
-  padding: 4px 8px;
+  flex: 0 1 auto;
+  min-height: calc(var(--phone-h) + 6mm);
+  padding: 5px 8px;
   border-radius: 14px;
   background:
     radial-gradient(ellipse 75% 90% at 50% 50%, var(--accent-glow), transparent 62%),
@@ -318,9 +318,8 @@ body {
   z-index: 1;
   width: var(--phone-w);
   flex-shrink: 0;
-  height: 100%;
+  height: auto;
   min-height: var(--phone-h);
-  max-height: 100%;
   border-radius: 16px;
   padding: 4px;
   background: linear-gradient(180deg, #12141a 0%, #000 100%);
@@ -353,9 +352,9 @@ body {
 .device img {
   display: block;
   width: 100%;
-  height: 100%;
-  min-height: 0;
-  flex: 1 1 auto;
+  height: var(--phone-h);
+  min-height: var(--phone-h);
+  flex: none;
   object-fit: cover;
   object-position: top center;
   border-radius: 12px;
@@ -397,9 +396,9 @@ body {
 }
 
 .note span {
-  font-size: 9.5px;
-  color: #7c8a9e;
-  line-height: 1.4;
+  font-size: 10px;
+  color: #94a3b8;
+  line-height: 1.45;
   word-break: keep-all;
 }
 
@@ -420,7 +419,7 @@ body {
 }
 
 .impact-box p {
-  font-size: 11.5px;
+  font-size: 11px;
   color: #cbd5e1;
   line-height: 1.5;
   word-break: keep-all;

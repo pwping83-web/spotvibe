@@ -7,11 +7,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="enx-brochure-inline.css?v=11" />
+  <link rel="stylesheet" href="enx-brochure-inline.css?v=12" />
 </head>
 <body class="theme-fire">
   <p class="screen-bar no-print">
-    <span><b>01 · 소방·재난</b><br />A4 · 배경 ON</span>
+    <span><b>01 · 소방·재난안전</b><br />A4 · 배경 ON</span>
     <button type="button" onclick="window.print()">PDF / 인쇄</button>
   </p>
   <article class="a4-canvas">
@@ -24,32 +24,57 @@
         <span class="concept-badge">Concept 01</span>
       </header>
       <section class="hero">
-        <h1>119 전 SOS,<br /><span>소화기 웹</span></h1>
-        <p class="lead"><strong>3km</strong> · 웹 · MVP</p>
-        <p class="disclaimer">※ 119 대체 아님</p></section>
+        <h1>119 전 이웃 안전망,<br /><span>시민 SOS·소화기</span></h1>
+        <p class="lead">119 도착 <strong>전</strong> 반경 <strong>3km</strong> 이웃 전파 · <strong>웹</strong>(설치 없음) · <strong>MVP 가동</strong></p>
+        <p class="disclaimer">※ 119·112·소방 <b>대체 아님</b> · 보조·선행 채널</p></section>
       <section class="stats">
-        <div class="stat"><b>3km</b><span>이웃</span></div>
-        <div class="stat"><b>15분</b><span>만료</span></div>
-        <div class="stat"><b>4</b><span>유형 SOS</span></div></section>
+        <div class="stat"><b>3km</b><span>이웃 실시간</span></div>
+        <div class="stat"><b>15분</b><span>SOS 만료</span></div>
+        <div class="stat"><b>4유형</b><span>화재·치안·조난·구급</span></div></section>
       <section class="features">
-        <div class="feature-card"><h3>🚨 SOS</h3><p>3km · 15분</p></div>
-        <div class="feature-card"><h3>🧯 소화기</h3><p>GPS+사진</p></div>
-        <div class="feature-card"><h3>🛡️ AI</h3><p>허위 차단</p></div></section>
+        <div class="feature-card">
+          <h3>🚨 이웃 SOS</h3>
+          <p>화재·치안·조난·구급 4유형 발신. 3km 실시간 전파, 15분 자동 종료.</p>
+        </div>
+        <div class="feature-card">
+          <h3>🧯 소화기 레이어</h3>
+          <p>GPS+사진 제보로 미등록 소화기 지도 표시. SOS FAB와 버튼 분리.</p>
+        </div>
+        <div class="feature-card">
+          <h3>🛡️ AI 검증</h3>
+          <p>텍스트·EXIF·비전으로 허위 차단. Supabase RLS로 권한 분리.</p>
+        </div></section>
       <section class="visual">
-        <div class="device"><img src="assets/brochure-spotvibe-sos-fire.png" alt="지도" onerror="this.style.display='none'" /></div>
+        <div class="device">
+          <img src="assets/brochure-spotvibe-sos-fire.png" alt="지도 시연" onerror="this.style.display='none'" />
+        </div>
         <div class="visual-notes">
-          <div class="note"><strong>UX</strong><span>SOS·소화기 분리</span></div>
-          <div class="note"><strong>QR</strong><span>앱 없이 시연</span></div></div>
+          <div class="note">
+            <strong>SOS · 소화기 분리</strong>
+            <span>상단 FAB 독립 운영. 안양·인천 현장 실증 완료.</span>
+          </div>
+          <div class="note">
+            <strong>QR 즉시 접속</strong>
+            <span>앱 설치 없이 스캔 → 현장 시연·SOS 체험.</span>
+          </div></div>
       </section>
-      <section class="impact-box"><h4>B2G</h4><p>지자체 PoC</p></section>
+      <section class="impact-box">
+        <h4>기대 효과 · B2G</h4>
+        <p>지자체·스마트시티·재난안전 PoC. SSG랜더스 TRYOUT 민간실증 KPI 측정.</p></section>
+
       <footer class="footer">
         <div class="footer-main">
-          <p class="company">이앤엑스 ENX</p>
-          <p class="meta">대표 박원평 · 302-47-00920<br /><a href="tel:01046392673">010-4639-2673</a> · <a href="mailto:tseizou@naver.com">tseizou@naver.com</a></p>
+          <p class="company">이앤엑스 ENX · 기획개발</p>
+          <p class="meta">대표 박원평 · 302-47-00920<br />
+            <a href="tel:01046392673">010-4639-2673</a> ·
+            <a href="mailto:tseizou@naver.com">tseizou@naver.com</a></p>
         </div>
         <div class="footer-end">
-          <div class="footer-stamp"><small>특허</small><strong>10-2026-0086971</strong></div>
-          <div class="footer-qr"><img src="assets/brochure-qr-spotvibe.png" alt="QR" width="44" height="44" onerror="this.style.display='none'" /><span>LIVE QR</span></div>
+          <div class="footer-stamp"><small>특허 출원</small><strong>10-2026-0086971</strong></div>
+          <div class="footer-qr">
+            <img src="assets/brochure-qr-spotvibe.png" alt="QR" width="44" height="44" onerror="this.style.display='none'" />
+            <span>LIVE QR</span>
+          </div>
         </div>
       </footer>
     </div>

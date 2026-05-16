@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ENX 제안서 - 접근성</title>
+  <title>ENX 제안서 - 접근성·시각장애인</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="enx-brochure-inline.css?v=11" />
+  <link rel="stylesheet" href="enx-brochure-inline.css?v=12" />
 </head>
 <body class="theme-vi">
   <p class="screen-bar no-print">
-    <span><b>03 · 접근성</b><br />A4 · 배경 ON</span>
+    <span><b>03 · 접근성·배리어프리</b><br />A4 · 배경 ON</span>
     <button type="button" onclick="window.print()">PDF / 인쇄</button>
   </p>
   <article class="a4-canvas">
@@ -24,31 +24,56 @@
         <span class="concept-badge">Concept 03</span>
       </header>
       <section class="hero">
-        <h1>들리는 안내,<br /><span>배리어프리 웹</span></h1>
-        <p class="lead"><strong>TTS</strong> · 135m · MVP</p></section>
+        <h1>보이지 않아도 들리게,<br /><span>배리어프리 웹</span></h1>
+        <p class="lead">보행 위험·우회 <strong>TTS</strong> 안내 · <strong>135m</strong> 근접 · Opt-in · <strong>웹 MVP</strong></p></section>
       <section class="stats">
-        <div class="stat"><b>TTS</b><span>음성</span></div>
-        <div class="stat"><b>Opt-in</b><span>동의</span></div>
-        <div class="stat"><b>135m</b><span>근접</span></div></section>
+        <div class="stat"><b>TTS</b><span>한국어 음성</span></div>
+        <div class="stat"><b>Opt-in</b><span>수신 동의</span></div>
+        <div class="stat"><b>135m</b><span>근접 알림</span></div></section>
       <section class="features">
-        <div class="feature-card"><h3>🦯 마커</h3><p>위험 제보</p></div>
-        <div class="feature-card"><h3>🔊 TTS</h3><p>한국어 안내</p></div>
-        <div class="feature-card"><h3>🏛️ RLS</h3><p>승인·모더</p></div></section>
+        <div class="feature-card">
+          <h3>🦯 안심 마커</h3>
+          <p>점자 파손·공사 등 보행 방해 요소 시민 제보·지도 표시.</p>
+        </div>
+        <div class="feature-card">
+          <h3>🔊 음성 안내</h3>
+          <p>135m 내 위험·우회 등록 시 TTS로 즉시 경고·안내.</p>
+        </div>
+        <div class="feature-card">
+          <h3>🏛️ RLS 연계</h3>
+          <p>지자체 승인·모더레이션. Supabase RLS 보안.</p>
+        </div></section>
       <section class="visual">
-        <div class="device"><img src="assets/brochure-spotvibe-sos-fire.png" alt="지도" onerror="this.style.display='none'" /></div>
+        <div class="device">
+          <img src="assets/brochure-spotvibe-sos-fire.png" alt="지도 시연" onerror="this.style.display='none'" />
+        </div>
         <div class="visual-notes">
-          <div class="note"><strong>RLS</strong><span>Supabase</span></div>
-          <div class="note"><strong>QR</strong><span>즉시 체험</span></div></div>
+          <div class="note">
+            <strong>실시간 · RLS</strong>
+            <span>Supabase 동기화·권한 분리로 공공 데이터 축적.</span>
+          </div>
+          <div class="note">
+            <strong>QR 즉시 체험</strong>
+            <span>앱 없이 스캔 → 음성 안내 체험.</span>
+          </div></div>
       </section>
-      <section class="impact-box"><h4>B2G</h4><p>무장애·복지</p></section>
+      <section class="impact-box">
+        <h4>기대 효과 · B2G</h4>
+        <p>무장애 도시·시각장애인연합회 접근성 사업. 비콘 없이 스마트폰·시민 참여.</p></section>
+
       <footer class="footer">
         <div class="footer-main">
-          <p class="company">이앤엑스 ENX</p>
-          <p class="meta">대표 박원평 · 302-47-00920<br /><a href="tel:01046392673">010-4639-2673</a> · <a href="mailto:tseizou@naver.com">tseizou@naver.com</a></p>
+          <p class="company">이앤엑스 ENX · 기획개발</p>
+          <p class="meta">대표 박원평 · 302-47-00920<br />
+            <a href="tel:01046392673">010-4639-2673</a> ·
+            <a href="mailto:tseizou@naver.com">tseizou@naver.com</a></p>
         </div>
         <div class="footer-end">
-          <div class="footer-stamp"><small>특허</small><strong>10-2026-0086971</strong></div>
-          <div class="footer-qr"><img src="assets/brochure-qr-spotvibe.png" alt="QR" width="44" height="44" onerror="this.style.display='none'" /><span>LIVE QR</span></div>
+          <div class="footer-stamp"><small>특허 출원</small><strong>10-2026-0086971</strong></div>
+          <div class="footer-qr">
+            <img src="assets/brochure-qr-spotvibe.png" alt="QR" width="44" height="44" onerror="this.style.display='none'" />
+            <span>LIVE QR</span>
+          </div>
         </div>
       </footer>
     </div>
