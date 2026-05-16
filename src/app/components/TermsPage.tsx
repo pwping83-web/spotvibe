@@ -1,5 +1,11 @@
 import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router';
+import {
+  ENX_CONTACT_EMAIL,
+  ENX_CONTACT_PHONE_DISPLAY,
+  ENX_CONTACT_PHONE_TEL,
+  ENX_REPRESENTATIVE_NAME,
+} from '@/app/constants/operatorContact';
 import { BusinessInfoSection } from './BusinessInfoSection';
 
 /** 카카오·스토어 심사용 공개 페이지 — 법률 검토 전 초안 */
@@ -78,7 +84,15 @@ export function TermsPage() {
         <section className="mb-8 space-y-2 text-[13px] leading-relaxed">
           <h2 className="text-[14px] font-semibold text-white">제4조 (면책·문의)</h2>
           <p className="text-white/70">
-            서비스는 현 상태로 제공됩니다. 문의는 앱 내 경로를 이용해 주시기 바랍니다.
+            서비스는 현 상태로 제공됩니다. 문의는 앱 내 「마이」 문의 또는 담당 {ENX_REPRESENTATIVE_NAME} ·{' '}
+            <a href={`tel:${ENX_CONTACT_PHONE_TEL}`} className="text-cyan-300/90 underline-offset-2 hover:underline">
+              {ENX_CONTACT_PHONE_DISPLAY}
+            </a>
+            {' · '}
+            <a href={`mailto:${ENX_CONTACT_EMAIL}`} className="text-cyan-300/90 underline-offset-2 hover:underline">
+              {ENX_CONTACT_EMAIL}
+            </a>
+            로 연락해 주시기 바랍니다.
           </p>
         </section>
 

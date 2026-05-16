@@ -1,3 +1,11 @@
+import {
+  ENX_BUSINESS_REG_NUMBER,
+  ENX_CONTACT_EMAIL,
+  ENX_CONTACT_PHONE_DISPLAY,
+  ENX_REPRESENTATIVE_NAME,
+  ENX_TRADE_NAME,
+} from '@/app/constants/operatorContact';
+
 export type BusinessInfo = {
   tradeName: string;
   representative: string;
@@ -23,14 +31,14 @@ function trimEnv(key: string): string {
 export function getBusinessInfo(): BusinessInfo {
   const addressFromEnv = trimEnv('VITE_BUSINESS_ADDRESS');
   return {
-    tradeName: trimEnv('VITE_BUSINESS_TRADE_NAME'),
-    representative: trimEnv('VITE_BUSINESS_REPRESENTATIVE'),
-    regNumber: trimEnv('VITE_BUSINESS_REG_NUMBER'),
+    tradeName: trimEnv('VITE_BUSINESS_TRADE_NAME') || ENX_TRADE_NAME,
+    representative: trimEnv('VITE_BUSINESS_REPRESENTATIVE') || ENX_REPRESENTATIVE_NAME,
+    regNumber: trimEnv('VITE_BUSINESS_REG_NUMBER') || ENX_BUSINESS_REG_NUMBER,
     industry: trimEnv('VITE_BUSINESS_INDUSTRY'),
     address: addressFromEnv || DEFAULT_BUSINESS_ADDRESS,
-    phone: trimEnv('VITE_BUSINESS_PHONE'),
+    phone: trimEnv('VITE_BUSINESS_PHONE') || ENX_CONTACT_PHONE_DISPLAY,
     ecommerceReport: trimEnv('VITE_BUSINESS_ECOMMERCE_REPORT_NUMBER'),
-    email: trimEnv('VITE_BUSINESS_EMAIL'),
+    email: trimEnv('VITE_BUSINESS_EMAIL') || ENX_CONTACT_EMAIL,
   };
 }
 

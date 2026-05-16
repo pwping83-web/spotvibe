@@ -24,6 +24,7 @@ import { PrivacyPage } from './components/PrivacyPage';
 import { TermsPage } from './components/TermsPage';
 import { CompanyInfoPage } from './components/CompanyInfoPage';
 import { ServiceIntroPage } from './components/ServiceIntroPage';
+import { UserManualPage } from './components/UserManualPage';
 import { ReviewFlowTocPage } from './components/ReviewFlowTocPage';
 import { SignupPage } from './components/SignupPage';
 import { Toaster, toast } from 'sonner';
@@ -915,6 +916,7 @@ function AppRoutes() {
       <Route path="/terms" element={<TermsPage />} />
       <Route path="/company" element={<CompanyInfoPage />} />
       <Route path="/service" element={<ServiceIntroPage />} />
+      <Route path="/manual" element={<UserManualPage />} />
       <Route path="/review-flow" element={<ReviewFlowTocPage />} />
       <Route
         path="/signup"

@@ -1,4 +1,5 @@
 ﻿import React, { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router';
 import {
   Circle,
   CircleMarker,
@@ -22,6 +23,7 @@ import {
   Images,
   Search,
   Info,
+  BookOpen,
 } from 'lucide-react';
 import { SpotReportUpload } from './SpotReportUpload';
 import { ExploreRegionFlowPanel } from './ExploreRegionFlowPanel';
@@ -1460,6 +1462,7 @@ export function MapArea({
   userId = null,
   mapServerEnabled = true,
 }: MapAreaProps) {
+  const navigate = useNavigate();
   const simOn = dataMode === 'test';
   const profilePal = useMemo(() => getAgeGenderColors(profileAgeRange), [profileAgeRange]);
   const crowdTight = useMemo(
@@ -3623,6 +3626,26 @@ export function MapArea({
                   <span className="block h-1 w-full rounded-full bg-white/20" />
                 </button>
               </div>
+              <p className="mb-3 text-[11px] font-bold uppercase tracking-widest text-white/30">도움말</p>
+              <motion.button
+                type="button"
+                whileTap={{ scale: 0.97 }}
+                onClick={() => {
+                  setQuickPanelOpen(false);
+                  navigate('/manual');
+                }}
+                className="mx-4 mb-4 flex items-center gap-3 rounded-xl px-4 py-3 text-left"
+                style={{ background: 'rgba(0,240,255,0.06)', border: '1px solid rgba(0,240,255,0.22)' }}
+              >
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#00F0FF]/10">
+                  <BookOpen size={18} style={{ color: '#00F0FF' }} />
+                </span>
+                <div className="flex-1">
+                  <p className="text-[13px] font-bold text-white">사용 설명서</p>
+                  <p className="mt-0.5 text-[11px] text-white/35">요약 · 표준 · 상세로 기능 안내</p>
+                </div>
+                <ChevronRight size={16} className="shrink-0 text-white/25" />
+              </motion.button>
               <p className="mb-3 text-[11px] font-bold uppercase tracking-widest text-white/30">위치 제보</p>
               <div className="flex flex-col gap-2">
                 {[

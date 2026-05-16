@@ -1,7 +1,9 @@
+import { ENX_CONTACT_EMAIL } from '@/app/constants/operatorContact';
+
 /**
  * 운영·문의 수신 메일 (mailto·평문 푸터에 사용).
  */
-export const SPOTVIBE_INQUIRY_EMAIL = 'wespdd@gmail.com';
+export const SPOTVIBE_INQUIRY_EMAIL = ENX_CONTACT_EMAIL;
 
 export type InquiryKind = 'improvement' | 'ad' | 'event' | 'other';
 

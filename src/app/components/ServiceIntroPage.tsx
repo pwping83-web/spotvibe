@@ -1,6 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router';
+import {
+  ENX_CONTACT_EMAIL,
+  ENX_CONTACT_PHONE_DISPLAY,
+  ENX_CONTACT_PHONE_TEL,
+  ENX_REPRESENTATIVE_NAME,
+} from '@/app/constants/operatorContact';
 import { LocationRealtimeInfoBlock } from '@/app/components/LocationRealtimeInfoBlock';
+import { BusinessInfoSection } from '@/app/components/BusinessInfoSection';
 
 export function ServiceIntroPage() {
   return (
@@ -95,6 +102,22 @@ export function ServiceIntroPage() {
           <h2 className="mb-3 text-[14px] font-semibold text-white">실시간 위치·분포</h2>
           <LocationRealtimeInfoBlock className="text-[12px] leading-relaxed text-white/55" />
         </section>
+
+        <section className="mb-8 rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-4 text-center">
+          <h2 className="mb-2 text-[13px] font-semibold text-white">문의</h2>
+          <p className="text-[12px] leading-relaxed text-white/55">
+            담당 {ENX_REPRESENTATIVE_NAME} ·{' '}
+            <a href={`tel:${ENX_CONTACT_PHONE_TEL}`} className="text-cyan-300/90 underline-offset-2 hover:underline">
+              {ENX_CONTACT_PHONE_DISPLAY}
+            </a>
+            {' · '}
+            <a href={`mailto:${ENX_CONTACT_EMAIL}`} className="text-cyan-300/90 underline-offset-2 hover:underline">
+              {ENX_CONTACT_EMAIL}
+            </a>
+          </p>
+        </section>
+
+        <BusinessInfoSection tone="page" variant="compact" />
 
         {/* 안내 문구 */}
         <p className="mb-8 text-center text-[11.5px] leading-relaxed text-white/35">

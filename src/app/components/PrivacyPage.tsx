@@ -1,5 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router';
+import {
+  ENX_CONTACT_EMAIL,
+  ENX_CONTACT_PHONE_DISPLAY,
+  ENX_CONTACT_PHONE_TEL,
+  ENX_REPRESENTATIVE_NAME,
+} from '@/app/constants/operatorContact';
 import { BusinessInfoSection } from './BusinessInfoSection';
 
 /** 카카오·스토어 심사용 공개 페이지 — 법률 검토 전 초안 */
@@ -50,7 +56,16 @@ export function PrivacyPage() {
 
         <section className="mb-8 space-y-2 text-[13px] leading-relaxed">
           <h2 className="text-[14px] font-semibold text-white">6. 문의</h2>
-          <p className="text-white/70">앱 내 문의 또는 운영 이메일(준비 중)을 통해 연락 주시기 바랍니다.</p>
+          <p className="text-white/70">
+            앱 내 문의 또는 아래 연락처로 문의해 주세요. 담당: {ENX_REPRESENTATIVE_NAME} ·{' '}
+            <a href={`tel:${ENX_CONTACT_PHONE_TEL}`} className="text-cyan-300/90 underline-offset-2 hover:underline">
+              {ENX_CONTACT_PHONE_DISPLAY}
+            </a>
+            {' · '}
+            <a href={`mailto:${ENX_CONTACT_EMAIL}`} className="text-cyan-300/90 underline-offset-2 hover:underline">
+              {ENX_CONTACT_EMAIL}
+            </a>
+          </p>
         </section>
 
         <BusinessInfoSection tone="page" />

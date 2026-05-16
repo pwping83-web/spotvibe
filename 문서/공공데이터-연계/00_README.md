@@ -14,3 +14,12 @@
 
 - Edge: `supabase/functions/sync-public-notices/index.ts`
 - 마이그레이션: `supabase/migrations/20260512140000_public_notices.sql`
+
+## 담당·연락처 (활용신청·문의)
+
+| 구분 | 내용 |
+|------|------|
+| 사업자 | 이앤엑스 (ENX) |
+| 대표 | **박원평** |
+| 연락처 | **010-4639-2673** |
+| 이메일 | **tseizou@naver.com** |

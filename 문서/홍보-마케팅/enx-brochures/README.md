@@ -27,3 +27,7 @@
 | `assets/enx-logo.png` | 푸터 로고 (없으면 ENX 텍스트 박스) |
 
 캡처 이미지를 넣으려면 HTML의 `visual-placeholder` 블록을 예시처럼 `<img src="assets/..." alt="..." />` 로 바꾸면 된다.
+
+## 푸터 연락처 (모든 HTML 공통)
+
+대표 **박원평** · 사업자등록번호 302-47-00920 · 010-4639-2673 · tseizou@naver.com
