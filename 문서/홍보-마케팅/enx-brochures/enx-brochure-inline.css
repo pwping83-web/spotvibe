@@ -5,6 +5,8 @@
   --border-card: rgba(255, 255, 255, 0.08);
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
+  --phone-w: 54mm;
+  --phone-h: 78mm;
   --accent: #a855f7;
   --accent-glow: rgba(168, 85, 247, 0.15);
   --accent-grad: linear-gradient(135deg, #c084fc, #a855f7);
@@ -123,7 +125,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12mm;
+  margin-bottom: 9mm;
 }
 
 .header-brand {
@@ -167,10 +169,10 @@ body {
   text-transform: uppercase;
 }
 
-.hero { margin-bottom: 8mm; }
+.hero { margin-bottom: 6mm; }
 
 .hero h1 {
-  font-size: 30px;
+  font-size: 28px;
   font-weight: 900;
   line-height: 1.35;
   margin-bottom: 14px;
@@ -214,7 +216,7 @@ body {
 .stats {
   display: flex;
   gap: 12px;
-  margin-bottom: 12mm;
+  margin-bottom: 7mm;
 }
 
 .stat {
@@ -244,8 +246,8 @@ body {
 .features {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 5mm;
-  margin-bottom: 6mm;
+  gap: 4mm;
+  margin-bottom: 5mm;
   flex-shrink: 0;
 }
 
@@ -253,40 +255,40 @@ body {
   background: var(--bg-card);
   border: 1px solid var(--border-card);
   border-radius: 12px;
-  padding: 18px;
+  padding: 12px 14px;
   border-top: 3px solid var(--accent);
 }
 
 .feature-card h3 {
-  font-size: 15px;
-  margin-bottom: 10px;
+  font-size: 13.5px;
+  margin-bottom: 6px;
   color: var(--text-main);
   font-weight: 700;
 }
 
 .feature-card p {
-  font-size: 12.5px;
+  font-size: 11px;
   color: var(--text-muted);
-  line-height: 1.6;
+  line-height: 1.5;
   word-break: keep-all;
 }
 
 /* 시연 화면 — 세로 폰 프레임 (좌, 고정 폭) + 노트 (우) */
 .visual {
   display: grid;
-  grid-template-columns: 42mm 1fr;
+  grid-template-columns: var(--phone-w) 1fr;
   gap: 5mm;
   align-items: stretch;
   margin-bottom: 4mm;
   flex: 1 1 auto;
-  min-height: 62mm;
+  min-height: calc(var(--phone-h) + 6mm);
 }
 
 .device {
   position: relative;
-  width: 42mm;
+  width: var(--phone-w);
   height: 100%;
-  min-height: 58mm;
+  min-height: var(--phone-h);
   border-radius: 14px;
   padding: 6px;
   background: linear-gradient(165deg, #1e293b 0%, #0f172a 100%);
@@ -314,8 +316,8 @@ body {
 .device img {
   display: block;
   width: 100%;
-  height: 58mm;
-  min-height: 58mm;
+  height: var(--phone-h);
+  min-height: var(--phone-h);
   flex: 1 1 auto;
   object-fit: cover;
   object-position: top center;
