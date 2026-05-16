@@ -5,6 +5,8 @@
   --border-card: rgba(255, 255, 255, 0.08);
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
+  --phone-w: 58mm;
+  --phone-h: 86mm;
   --accent: #a855f7;
   --accent-glow: rgba(168, 85, 247, 0.15);
   --accent-grad: linear-gradient(135deg, #c084fc, #a855f7);
@@ -245,7 +247,8 @@ body {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 6mm;
-  margin-bottom: 8mm;
+  margin-bottom: 6mm;
+  flex-shrink: 0;
 }
 
 .feature-card {
@@ -270,48 +273,79 @@ body {
   word-break: keep-all;
 }
 
+/* 시연 지도 — 세로 폰 프레임만 확대 (본문·카드는 유지) */
 .visual {
-  display: flex;
-  gap: 6mm;
-  margin-bottom: auto;
-  align-items: center;
+  display: grid;
+  grid-template-columns: var(--phone-w) 1fr;
+  gap: 5mm;
+  align-items: stretch;
+  margin-bottom: 5mm;
+  flex: 1 1 auto;
+  min-height: calc(var(--phone-h) + 10mm);
   background: var(--bg-card);
-  padding: 16px;
+  padding: 12px 14px;
   border-radius: 12px;
   border: 1px solid var(--border-card);
 }
 
 .device {
-  width: 140px;
-  height: 100px;
-  background: #1e1e24;
-  border-radius: 8px;
+  position: relative;
+  width: 100%;
+  min-height: var(--phone-h);
+  height: 100%;
+  border-radius: 14px;
+  padding: 6px;
+  background: linear-gradient(165deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
+}
+
+.device::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28%;
+  height: 3px;
+  border-radius: 3px;
+  background: #334155;
+  z-index: 2;
+  pointer-events: none;
 }
 
 .device img {
+  display: block;
   width: 100%;
   height: 100%;
+  min-height: var(--phone-h);
+  flex: 1 1 auto;
   object-fit: cover;
   object-position: top center;
-  opacity: 0.9;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .visual-notes {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  justify-content: center;
+  gap: 10px;
+  min-height: 0;
 }
 
 .note {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  border-left: 3px solid var(--accent);
 }
 
 .note strong {
@@ -330,8 +364,9 @@ body {
   background: linear-gradient(90deg, var(--impact-grad), transparent);
   border-left: 4px solid var(--accent);
   padding: 16px 20px;
-  margin-bottom: 10mm;
+  margin-bottom: 8mm;
   border-radius: 0 8px 8px 0;
+  flex-shrink: 0;
 }
 
 .impact-box h4 {
@@ -354,6 +389,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
+  flex-shrink: 0;
 }
 
 .footer-main {
