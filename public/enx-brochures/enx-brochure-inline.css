@@ -5,8 +5,8 @@
   --border-card: rgba(255, 255, 255, 0.08);
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
-  --phone-w: 67mm;
-  --phone-h: 99mm;
+  --phone-w: 70mm;
+  --phone-h: 118mm;
   --screen-stage: #030408;
   --accent: #a855f7;
   --accent-glow: rgba(168, 85, 247, 0.15);
@@ -97,7 +97,7 @@ body {
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
-  padding: 12mm 14mm;
+  padding: 10mm 12mm;
 }
 
 .a4-canvas::before {
@@ -126,7 +126,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 5mm;
+  margin-bottom: 3mm;
 }
 
 .header-brand {
@@ -170,7 +170,7 @@ body {
   text-transform: uppercase;
 }
 
-.hero { margin-bottom: 4mm; }
+.hero { margin-bottom: 3mm; }
 
 .hero h1 {
   font-size: 24px;
@@ -217,7 +217,7 @@ body {
 .stats {
   display: flex;
   gap: 8px;
-  margin-bottom: 4mm;
+  margin-bottom: 2mm;
 }
 
 .stat {
@@ -248,7 +248,7 @@ body {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 3mm;
-  margin-bottom: 3mm;
+  margin-bottom: 2mm;
   flex-shrink: 0;
   opacity: 0.88;
 }
@@ -275,20 +275,21 @@ body {
   word-break: keep-all;
 }
 
-/* ★ 시연 지도 화면 — 페이지 핵심, 크고 어둡게 */
+/* ★ 시연 지도 화면 — 남는 세로 공간 최대 활용 */
 .visual {
   position: relative;
-  display: grid;
-  grid-template-columns: var(--phone-w) 1fr;
-  gap: 4mm;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
   align-items: stretch;
+  gap: 4mm;
   margin-bottom: 2mm;
-  flex: 1 1 auto;
-  min-height: calc(var(--phone-h) + 8mm);
-  padding: 5px 6px 5px 5px;
+  flex: 1 1 0;
+  min-height: var(--phone-h);
+  padding: 4px 8px;
   border-radius: 14px;
   background:
-    radial-gradient(ellipse 70% 90% at 18% 50%, var(--accent-glow), transparent 62%),
+    radial-gradient(ellipse 75% 90% at 50% 50%, var(--accent-glow), transparent 62%),
     linear-gradient(135deg, var(--screen-stage) 0%, #0a0b12 48%, #050508 100%);
   border: 1px solid rgba(255, 255, 255, 0.07);
   box-shadow:
@@ -299,11 +300,11 @@ body {
 .visual::after {
   content: "";
   position: absolute;
-  left: 4mm;
+  left: 50%;
   top: 50%;
-  transform: translateY(-50%);
-  width: calc(var(--phone-w) + 4mm);
-  height: calc(var(--phone-h) + 6mm);
+  transform: translate(-50%, -50%);
+  width: calc(var(--phone-w) + 8mm);
+  height: 88%;
   background: var(--accent);
   filter: blur(36px);
   opacity: 0.22;
@@ -316,16 +317,18 @@ body {
   position: relative;
   z-index: 1;
   width: var(--phone-w);
+  flex-shrink: 0;
   height: 100%;
   min-height: var(--phone-h);
+  max-height: 100%;
   border-radius: 16px;
-  padding: 5px;
+  padding: 4px;
   background: linear-gradient(180deg, #12141a 0%, #000 100%);
   border: 2px solid rgba(255, 255, 255, 0.14);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  align-self: center;
+  align-self: stretch;
   box-shadow:
     0 16px 48px rgba(0, 0, 0, 0.85),
     0 0 0 1px rgba(0, 0, 0, 0.9),
@@ -350,8 +353,8 @@ body {
 .device img {
   display: block;
   width: 100%;
-  height: var(--phone-h);
-  min-height: var(--phone-h);
+  height: 100%;
+  min-height: 0;
   flex: 1 1 auto;
   object-fit: cover;
   object-position: top center;
@@ -369,6 +372,9 @@ body {
   flex-direction: column;
   justify-content: center;
   gap: 6px;
+  flex: 0 1 auto;
+  max-width: 48%;
+  min-width: 0;
   min-height: 0;
   opacity: 0.88;
 }
@@ -400,8 +406,8 @@ body {
 .impact-box {
   background: linear-gradient(90deg, var(--impact-grad), transparent);
   border-left: 3px solid var(--accent);
-  padding: 7px 10px;
-  margin-bottom: 4mm;
+  padding: 6px 10px;
+  margin-bottom: 3mm;
   border-radius: 0 8px 8px 0;
   flex-shrink: 0;
 }
@@ -422,7 +428,7 @@ body {
 
 .footer {
   border-top: 1px solid var(--border-card);
-  padding-top: 4mm;
+  padding-top: 3mm;
   display: flex;
   align-items: flex-end;
   gap: 12px;
