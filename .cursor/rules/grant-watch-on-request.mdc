@@ -16,6 +16,8 @@ IRIS(접수중) + NTIS(선택) + 중소벤처24 SMES API를 돌려 키워드 매
 - `artifacts/grant-watch/grant-hub-last-run.json`
 - `문서/지원사업/99_공고-모니터링-최근결과.md`
 
+사용자-facing 요약·우선순위는 **`문서/지원사업/05_지원사업-공고-현황.md`** — 지원사업 질문 시 `.cursor/rules/grant-status-living-doc.mdc` 에 따라 `grant:watch` 후 **05도 함께 갱신**.
+
 ## 실행 방법 (Windows PowerShell, 저장소 루트 `d:\SpotVibe`)
 
 ```powershell
@@ -58,6 +60,7 @@ npm run grant:watch
 
 - `artifacts/grant-watch/grant-hub-last-run.json`
 - `문서/지원사업/99_공고-모니터링-최근결과.md`
+- (에이전트) `문서/지원사업/05_지원사업-공고-현황.md` — living 요약
 
 ## 다른 에이전트에게 넘길 때
 
