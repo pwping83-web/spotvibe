@@ -5,8 +5,8 @@
   --border-card: rgba(255, 255, 255, 0.08);
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
-  --phone-w: 58mm;
-  --phone-h: 86mm;
+  --phone-w: 56mm;
+  --phone-h: 74mm;
   --accent: #a855f7;
   --accent-glow: rgba(168, 85, 247, 0.15);
   --accent-grad: linear-gradient(135deg, #c084fc, #a855f7);
@@ -96,7 +96,7 @@ body {
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
-  padding: 16mm 18mm;
+  padding: 12mm 14mm;
 }
 
 .a4-canvas::before {
@@ -117,6 +117,7 @@ body {
   position: relative;
   z-index: 1;
   height: 100%;
+  min-height: 0;
   display: flex;
   flex-direction: column;
 }
@@ -125,7 +126,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12mm;
+  margin-bottom: 8mm;
+  flex-shrink: 0;
 }
 
 .header-brand {
@@ -216,7 +218,8 @@ body {
 .stats {
   display: flex;
   gap: 12px;
-  margin-bottom: 12mm;
+  margin-bottom: 7mm;
+  flex-shrink: 0;
 }
 
 .stat {
@@ -273,17 +276,19 @@ body {
   word-break: keep-all;
 }
 
-/* 시연 지도 — 세로 폰 프레임만 확대 (본문·카드는 유지) */
+/* 시연 지도 — 세로 폰 (푸터·사업자정보 잘리지 않게 상한) */
 .visual {
   display: grid;
   grid-template-columns: var(--phone-w) 1fr;
   gap: 5mm;
   align-items: stretch;
-  margin-bottom: 5mm;
-  flex: 1 1 auto;
-  min-height: calc(var(--phone-h) + 10mm);
+  margin-bottom: 4mm;
+  flex: 1 1 0;
+  min-height: 0;
+  max-height: calc(var(--phone-h) + 8mm);
+  overflow: hidden;
   background: var(--bg-card);
-  padding: 12px 14px;
+  padding: 10px 12px;
   border-radius: 12px;
   border: 1px solid var(--border-card);
 }
@@ -363,8 +368,8 @@ body {
 .impact-box {
   background: linear-gradient(90deg, var(--impact-grad), transparent);
   border-left: 4px solid var(--accent);
-  padding: 16px 20px;
-  margin-bottom: 8mm;
+  padding: 10px 14px;
+  margin-bottom: 4mm;
   border-radius: 0 8px 8px 0;
   flex-shrink: 0;
 }
@@ -385,11 +390,13 @@ body {
 
 .footer {
   border-top: 1px solid var(--border-card);
-  padding-top: 6mm;
+  padding-top: 4mm;
+  margin-top: auto;
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
   flex-shrink: 0;
+  gap: 10px;
 }
 
 .footer-main {
@@ -406,12 +413,12 @@ body {
 
 .footer-main .meta {
   font-size: 11px;
-  color: var(--text-muted);
-  line-height: 1.6;
+  color: #cbd5e1;
+  line-height: 1.55;
 }
 
 .footer-main a {
-  color: var(--text-muted);
+  color: #e2e8f0;
   text-decoration: none;
 }
 
