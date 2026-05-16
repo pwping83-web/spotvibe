@@ -258,13 +258,27 @@ function videoFrameToJpegFile(video: HTMLVideoElement): Promise<File | null> {
   });
 }
 
-function scrollFieldIntoView(e: React.FocusEvent<HTMLInputElement>) {
-  const el = e.target;
-  const run = () =>
-    el.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'smooth' });
+/** 시트 내부 스크롤만 — window scrollIntoView는 지도 탭이 밀려 나가는 것처럼 보이게 함 */
+function scrollInputIntoSheet(
+  el: HTMLInputElement,
+  container: HTMLElement | null,
+) {
+  const run = () => {
+    if (container) {
+      const pad = 16;
+      const cRect = container.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+      let delta = 0;
+      if (elRect.top < cRect.top + pad) delta = elRect.top - cRect.top - pad;
+      else if (elRect.bottom > cRect.bottom - pad) delta = elRect.bottom - cRect.bottom + pad;
+      if (delta !== 0) container.scrollBy({ top: delta, behavior: 'smooth' });
+    } else {
+      el.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+    }
+  };
   window.requestAnimationFrame(run);
   window.setTimeout(run, 100);
-  window.setTimeout(run, 280);
+  window.setTimeout(run, 320);
   window.setTimeout(run, 520);
 }
 
@@ -279,11 +293,15 @@ export function SpotReportUpload({
 }: SpotReportUploadProps) {
   const { userId } = useAuth();
   const videoRef = useRef<HTMLVideoElement>(null);
+  const sheetScrollRef = useRef<HTMLDivElement>(null);
   const adminFileInputRef = useRef<HTMLInputElement>(null);
   const cameraStreamRef = useRef<MediaStream | null>(null);
   const [uploadState, setUploadState] = useState<UploadState>('idle');
   const [showSheet, setShowSheet] = useState(false);
   const [cameraOpen, setCameraOpen] = useState(false);
+  const [cameraVideoReady, setCameraVideoReady] = useState(false);
+  /** 모바일 키보드 — visualViewport 기준 시트를 위로 올림 */
+  const [keyboardInset, setKeyboardInset] = useState(0);
   const [preview, setPreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [pickSource, setPickSource] = useState<PickSource | null>(null);
@@ -326,7 +344,34 @@ export function SpotReportUpload({
     if (!showSheet) {
       stopCameraTracks();
       setCameraOpen(false);
+      setCameraVideoReady(false);
     }
+  }, [showSheet]);
+
+  useEffect(() => {
+    if (!showSheet) {
+      setKeyboardInset(0);
+      return;
+    }
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const vv = window.visualViewport;
+    const updateKeyboardInset = () => {
+      if (!vv) {
+        setKeyboardInset(0);
+        return;
+      }
+      setKeyboardInset(Math.max(0, window.innerHeight - vv.height - vv.offsetTop));
+    };
+    updateKeyboardInset();
+    vv?.addEventListener('resize', updateKeyboardInset);
+    vv?.addEventListener('scroll', updateKeyboardInset);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      vv?.removeEventListener('resize', updateKeyboardInset);
+      vv?.removeEventListener('scroll', updateKeyboardInset);
+      setKeyboardInset(0);
+    };
   }, [showSheet]);
 
   useEffect(() => {
@@ -334,12 +379,29 @@ export function SpotReportUpload({
   }, [preview]);
 
   useEffect(() => {
-    if (!cameraOpen) return;
+    if (!cameraOpen) {
+      setCameraVideoReady(false);
+      return;
+    }
     const v = videoRef.current;
     const s = cameraStreamRef.current;
-    if (v && s) v.srcObject = s;
+    if (!v || !s) return;
+
+    const markReady = () => {
+      if (v.videoWidth >= 2 && v.videoHeight >= 2) setCameraVideoReady(true);
+    };
+
+    v.srcObject = s;
+    setCameraVideoReady(false);
+    v.addEventListener('loadedmetadata', markReady);
+    v.addEventListener('resize', markReady);
+    void v.play().then(markReady).catch(() => {});
+
     return () => {
-      if (v) v.srcObject = null;
+      v.removeEventListener('loadedmetadata', markReady);
+      v.removeEventListener('resize', markReady);
+      v.srcObject = null;
+      setCameraVideoReady(false);
     };
   }, [cameraOpen]);
 
@@ -358,23 +420,38 @@ export function SpotReportUpload({
       });
       return;
     }
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
+    const constraintAttempts: MediaStreamConstraints[] = [
+      {
         video: {
           facingMode: { ideal: 'environment' },
           width: { ideal: 1280 },
           height: { ideal: 720 },
         },
         audio: false,
-      });
-      stopCameraTracks();
-      cameraStreamRef.current = stream;
-      setCameraOpen(true);
-    } catch {
+      },
+      { video: { facingMode: 'environment' }, audio: false },
+      { video: true, audio: false },
+    ];
+    let stream: MediaStream | null = null;
+    let lastErr: unknown;
+    for (const constraints of constraintAttempts) {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+        break;
+      } catch (e) {
+        lastErr = e;
+      }
+    }
+    if (!stream) {
+      console.warn('getUserMedia failed:', lastErr);
       toast.error('카메라를 열 수 없어요.', {
         description: '브라우저 설정에서 이 사이트의 카메라 권한을 허용해 주세요.',
       });
+      return;
     }
+    stopCameraTracks();
+    cameraStreamRef.current = stream;
+    setCameraOpen(true);
   }
 
   function closeSpotCamera() {
@@ -384,7 +461,30 @@ export function SpotReportUpload({
 
   async function shutterCapture() {
     const video = videoRef.current;
-    if (!video || video.videoWidth < 2) {
+    if (!video) {
+      toast.error('카메라가 아직 준비되지 않았어요.', { description: '잠시 후 다시 눌러 주세요.' });
+      return;
+    }
+    if (video.videoWidth < 2) {
+      try {
+        await video.play();
+      } catch {
+        /* ignore */
+      }
+      await new Promise<void>((resolve) => {
+        if (video.videoWidth >= 2) {
+          resolve();
+          return;
+        }
+        const done = () => {
+          video.removeEventListener('loadedmetadata', done);
+          resolve();
+        };
+        video.addEventListener('loadedmetadata', done);
+        window.setTimeout(done, 1200);
+      });
+    }
+    if (video.videoWidth < 2) {
       toast.error('카메라가 아직 준비되지 않았어요.', { description: '잠시 후 다시 눌러 주세요.' });
       return;
     }
@@ -776,6 +876,10 @@ export function SpotReportUpload({
     ? undefined
     : 'max(1.25rem, calc(5.75rem + env(safe-area-inset-bottom, 0px)))';
 
+  const handleSheetFieldFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    scrollInputIntoSheet(e.target, sheetScrollRef.current);
+  };
+
   return (
     <>
       {/* FAB — mapToolbar: 지역 검색 블록 위 / floating: 구형 우측 단독 */}
@@ -807,7 +911,8 @@ export function SpotReportUpload({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 z-[430] bg-black/65"
+              className="fixed inset-0 z-[430] bg-black/65 touch-none"
+              aria-hidden
               onClick={handleCancel}
             />
 
@@ -816,7 +921,9 @@ export function SpotReportUpload({
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-              className="absolute bottom-0 left-0 right-0 z-[440] flex max-h-[min(92dvh,720px)] flex-col rounded-t-2xl border-t border-white/10 bg-[#13131C] shadow-[0_-12px_48px_rgba(0,0,0,0.5)]"
+              className="fixed left-0 right-0 z-[440] flex max-h-[min(92dvh,720px)] flex-col rounded-t-2xl border-t border-white/10 bg-[#13131C] shadow-[0_-12px_48px_rgba(0,0,0,0.5)]"
+              style={{ bottom: keyboardInset }}
+              onClick={(e) => e.stopPropagation()}
             >
               <div className="shrink-0 px-5 pb-2 pt-4">
                 <div className="mx-auto mb-2 h-1 w-10 rounded-full bg-white/20" />
@@ -838,8 +945,9 @@ export function SpotReportUpload({
               </div>
 
               <div
-                className={`flex min-h-0 flex-1 flex-col px-5 ${
-                  hasStickyFooter ? 'overflow-hidden overscroll-none pb-2' : 'overflow-y-auto overscroll-y-contain'
+                ref={sheetScrollRef}
+                className={`flex min-h-0 flex-1 flex-col px-5 overflow-y-auto overscroll-y-contain ${
+                  hasStickyFooter ? 'pb-2' : ''
                 }`}
                 style={sheetBodyBottomPad ? { paddingBottom: sheetBodyBottomPad } : undefined}
               >
@@ -930,15 +1038,16 @@ export function SpotReportUpload({
                       </button>
                       <button
                         type="button"
+                        disabled={!cameraVideoReady}
                         onClick={() => void shutterCapture()}
-                        className="flex-1 rounded-xl border py-3 text-[13px] font-bold transition-all active:scale-[0.98]"
+                        className="flex-1 rounded-xl border py-3 text-[13px] font-bold transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-45"
                         style={{
                           borderColor: 'rgba(0,240,255,0.55)',
                           backgroundColor: 'rgba(0,240,255,0.2)',
                           color: '#00F0FF',
                         }}
                       >
-                        촬영
+                        {cameraVideoReady ? '촬영' : '카메라 준비 중…'}
                       </button>
                     </div>
                   </div>
@@ -957,7 +1066,7 @@ export function SpotReportUpload({
                         enterKeyHint="next"
                         value={placeName}
                         onChange={(e) => setPlaceName(e.target.value)}
-                        onFocus={scrollFieldIntoView}
+                        onFocus={handleSheetFieldFocus}
                         placeholder="예: 홍대 걷고싶은거리, 여의도 한강공원"
                         maxLength={50}
                         autoComplete="off"
@@ -974,7 +1083,7 @@ export function SpotReportUpload({
                         enterKeyHint="done"
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
-                        onFocus={scrollFieldIntoView}
+                        onFocus={handleSheetFieldFocus}
                         placeholder="예: 버스킹 공연 중, 플리마켓 열렸어요"
                         maxLength={80}
                         autoComplete="off"
