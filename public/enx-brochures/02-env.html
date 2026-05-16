@@ -7,12 +7,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="enx-brochure.css" />
+  <link rel="stylesheet" href="enx-brochure-inline.css" />
 </head>
 <body class="theme-env">
 
   <p class="screen-bar no-print">
-    <span><b>02 · 깨끗한 거리 — 환경부·지자체</b><br />A4 · 여백 없음 · 배경 그래픽 ON</span>
+    <span><b>02 · 깨끗한 거리 — 환경부·지자체</b><br />A4 · 여백 없음 · 배경 그래픽 ON 권장</span>
     <button type="button" onclick="window.print()">PDF 저장 / 인쇄</button>
   </p>
 
@@ -21,7 +21,7 @@
 
       <header class="header">
         <div class="header-brand">
-          <img src="assets/enx-app-icon.png" alt="" width="36" height="36" />
+          <img src="assets/enx-app-icon.png" alt="" width="36" height="36" onerror="this.style.display='none'" />
           <div class="logo">ENX<small>지금여기 SpotVibe</small></div>
         </div>
         <span class="concept-badge">Concept 02</span>
@@ -29,7 +29,7 @@
 
       <section class="hero">
         <h1>지도에 없던 분리수거함,<br /><span>시민이 찍어 올리는 환경 레이어</span></h1>
-        <p class="lead">네이버·카카오맵에 없는 <strong>공공 쓰레기통·분리수거함</strong>을 시민이 GPS+사진으로 제보합니다. 반경 <strong>500m</strong>에서 즉시 찾고, <strong>QR 웹</strong>으로 설치 없이 씁니다.</p>
+        <p class="lead">네이버·카카오맵에 없는 <strong>공공 쓰레기통·분리수거함</strong>을 시민이 GPS+사진으로 제보합니다. 반경 <strong>500m</strong>에서 즉시 찾고, <strong>앱 설치 없는 모바일 웹</strong>으로 지자체 청결망과 즉시 연동되는 환경 MVP가 지금 작동 중입니다.</p>
       </section>
 
       <section class="stats">
@@ -39,40 +39,61 @@
       </section>
 
       <section class="features">
-        <div class="feature-card"><h3>🗑️ 공공 쓰레기통 레이어</h3><p>지도 우측 아이콘·500m 원으로 공공 수거함 위치를 표시합니다.</p></div>
-        <div class="feature-card"><h3>📸 시민 제보·검증</h3><p>TrashBinSheet로 사진·GPS 등록·AI 검증.</p></div>
-        <div class="feature-card"><h3>♻️ 분리배출</h3><p>공원·골목·축제장 등 지도 미등록 구간을 시민 데이터로 채웁니다.</p></div>
-      </section>
-
-      <section class="visual">
-        <div class="device"><img src="assets/brochure-spotvibe-sos-fire.png" alt="지도 시연" /></div>
-        <div class="visual-notes">
-          <div class="note"><strong>공공 쓰레기통</strong><span>우측 지도 아이콘·제보 패널에서 조회·등록합니다.</span></div>
-          <div class="note"><strong>QR 웹</strong><span>설치 없이 현장 시연·체험.</span></div>
+        <div class="feature-card">
+          <h3>🗑️ 공공 쓰레기통 레이어</h3>
+          <p>지도 우측 아이콘·500m 원으로 공공 수거함 위치를 표시합니다. TrashBinSheet로 사진·GPS 등록이 가능합니다.</p>
+        </div>
+        <div class="feature-card">
+          <h3>📸 시민 제보·AI 검증</h3>
+          <p>텍스트·EXIF·비전으로 허위 제보를 줄이고, Supabase RLS로 권한을 분리합니다. 신뢰할 수 있는 분리배출 공공 데이터를 축적합니다.</p>
+        </div>
+        <div class="feature-card">
+          <h3>♻️ 분리배출 공백 메우기</h3>
+          <p>공원·골목·축제장 등 지도 미등록 구간을 시민 데이터로 채웁니다. 값비싼 하드웨어 없이 스마트폰·집단지성으로 촘촘한 청결망을 완성합니다.</p>
         </div>
       </section>
 
-      <section class="impact-box"><h4>기대 효과 및 협력 모델</h4><p>환경부 생활쓰레기·분리배출·지자체 청결 PoC 연계. 공공 지도의 쓰레기통 공백을 시민 참여로 메웁니다.</p></section>
+      <section class="visual">
+        <div class="device">
+          <img src="assets/brochure-spotvibe-sos-fire.png" alt="시연 화면" onerror="this.style.display='none'" />
+        </div>
+        <div class="visual-notes">
+          <div class="note">
+            <strong>공공 쓰레기통 · TrashBinSheet</strong>
+            <span>우측 지도 아이콘·제보 패널에서 조회·등록합니다. 실시간 동기화와 RLS로 지자체 연계 데이터를 안전하게 관리합니다.</span>
+          </div>
+          <div class="note">
+            <strong>Frictionless UX (QR 접속)</strong>
+            <span>무거운 네이티브 앱 다운로드 없이, QR 스캔 한 번으로 즉시 현장 시연·쓰레기통 제보 체험이 시작됩니다.</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="impact-box">
+        <h4>기대 효과 및 협력 모델 (B2G)</h4>
+        <p>환경부 생활쓰레기·분리배출·지자체 청결 PoC와 연계합니다. 공공 지도의 쓰레기통 공백을 시민 참여 소프트웨어로 메우는 비용 효율적 환경 레이어를 완성합니다.</p>
+      </section>
 
       <footer class="footer">
         <div class="footer-main">
-          <p class="company">(주)이앤엑스 ENX · 지금여기</p>
+          <p class="company">(주)이앤엑스 ENX · 기획개발그룹</p>
           <p class="meta">
-            대표 박원평 · 302-47-00920<br />
+            대표 박원평 · 사업자등록번호 302-47-00920<br />
             <a href="tel:01046392673">010-4639-2673</a> · <a href="mailto:tseizou@naver.com">tseizou@naver.com</a>
           </p>
         </div>
         <div class="footer-qr">
-          <img src="assets/brochure-qr-spotvibe.png" alt="시연 QR" width="44" height="44" />
+          <img src="assets/brochure-qr-spotvibe.png" alt="시연 QR" width="44" height="44" onerror="this.style.display='none'" />
           <span>LIVE 시연 QR</span>
         </div>
         <div class="footer-stamp">
-          <small>특허 출원</small>
+          <small>BM 특허 출원</small>
           <strong>10-2026-0086971</strong>
         </div>
       </footer>
 
     </div>
   </article>
+
 </body>
 </html>

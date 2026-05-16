@@ -1,26 +1,26 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ENX 1장 제안 브로슈어</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;900&family=Noto+Sans+KR:wght@700;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;900&family=Noto+Sans+KR:wght@500;700;900&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       min-height: 100vh;
-      background: #0a0b0f;
+      background: #12141c;
       color: #f8fafc;
       font-family: "Noto Sans KR", "Inter", sans-serif;
-      padding: 48px 20px;
+      padding: 40px 20px;
     }
     .wrap { max-width: 480px; margin: 0 auto; }
     .top { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
-    .top img { width: 48px; height: 48px; border-radius: 12px; }
+    .top img { width: 48px; height: 48px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); }
     h1 { font-size: 1.35rem; font-weight: 900; }
     h1 span { color: #00f0ff; }
     .lead { color: #94a3b8; font-size: 0.88rem; line-height: 1.55; margin-bottom: 24px; }
-    .lead code { background: #1e293b; padding: 2px 8px; border-radius: 4px; color: #00f0ff; font-size: 0.8rem; }
+    .lead code { background: #1e212b; padding: 2px 8px; border-radius: 4px; color: #00f0ff; font-size: 0.8rem; }
     a.card {
       display: block;
       padding: 18px 20px;
@@ -30,7 +30,6 @@
       color: inherit;
       border: 1px solid rgba(255,255,255,0.08);
       background: rgba(255,255,255,0.03);
-      transition: border-color 0.15s, transform 0.15s;
     }
     a.card:hover { border-color: rgba(0,240,255,0.35); transform: translateY(-2px); }
     .tag { font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em; margin-bottom: 6px; }
@@ -43,8 +42,8 @@
       margin-top: 24px;
       padding: 14px 16px;
       border-radius: 10px;
-      border: 1px solid rgba(0,240,255,0.18);
-      background: rgba(0,240,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      background: #1e212b;
       font-size: 0.82rem;
       color: #94a3b8;
       line-height: 1.5;
@@ -58,25 +57,25 @@
       <h1>ENX <span>1장 제안</span></h1>
     </div>
     <p class="lead">
-      다크 A4 제안서 · 수신처별 컨셉<br />
+      소방 HTML 형식 · 다크 A4<br />
       <code>npm run brochures</code> → <code>http://127.0.0.1:8765/</code>
     </p>
     <a class="card fire" href="01-fire.html">
       <p class="tag">CONCEPT 01</p>
       <strong>선행 안전망 — 소방·재난안전</strong>
-      <span>119 전 3km SOS · 소화기 시민 레이어 · AI 검증</span>
+      <span>119 전 3km SOS · 소화기 · AI 검증</span>
     </a>
     <a class="card env" href="02-env.html">
       <p class="tag">CONCEPT 02</p>
-      <strong>실적이 증명되는 바다 — SeaRestore</strong>
-      <span>IoT 살포 · ha 증빙 · 월 구독 SaaS</span>
+      <strong>깨끗한 거리 — 환경부·공공 쓰레기통</strong>
+      <span>500m · GPS 제보 · 분리수거함 (소방과 동일 레이아웃)</span>
     </a>
     <a class="card vi" href="03-vi.html">
       <p class="tag">CONCEPT 03</p>
       <strong>보이지 않아도, 들리게 — 접근성</strong>
-      <span>🦯 마커 · TTS 이웃 메시지 · 구청 연계</span>
+      <span>🦯 마커 · TTS · 구청 연계 MVP</span>
     </a>
-    <p class="tip">Chrome·Edge 권장 · <code>01-fire.html</code> 등 영문 파일명 사용. 인쇄: A4 · 여백 없음 · 배경 ON.</p>
+    <p class="tip">Chrome·Edge 권장 · <code>01-fire.html</code> 등 영문 파일명. 인쇄: A4 · 여백 없음 · 배경 ON.</p>
   </div>
 </body>
 </html>
