@@ -3,117 +3,92 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>환경·해양 — SeaRestore | ENX</title>
+  <title>ENX 제안서 - 환경·해양 SeaRestore</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="enx-brochure.css" />
 </head>
-<body>
+<body class="theme-env">
   <p class="screen-bar no-print">
-    <b>02 · 실적이 증명되는 바다</b> — 환경부·해양수산부<br />
+    <b>02 · 실적이 증명되는 바다 — 환경부·해양</b><br />
     A4 · 여백 없음 · 배경 그래픽 ON
     <button type="button" onclick="window.print()">PDF 저장 / 인쇄</button>
   </p>
 
-  <article class="sheet theme-env">
-    <header class="hero">
-      <div class="hero-grid" aria-hidden="true"></div>
-      <div class="hero-inner">
-        <div class="hero-meta">
-          <div class="brand">
-            <img src="assets/enx-app-icon.png" alt="" width="30" height="30" />
-            <div class="brand-text">ENX SeaRestore<small>해양 종자 살포 스마트 관제</small></div>
-          </div>
-          <span class="audience-badge">환경·해양</span>
+  <article class="a4-canvas">
+    <div class="content-wrapper">
+      <header class="header">
+        <div class="header-brand">
+          <img src="assets/enx-app-icon.png" alt="" width="36" height="36" />
+          <div class="logo">ENX<small>지금여기 SpotVibe</small></div>
         </div>
-        <p class="concept-label">CONCEPT · 실적이 증명되는 바다</p>
-        <h1>손으로 쓰지 않는 살포,<br /><em>GPS·IoT</em>가 증명한다</h1>
-        <p class="hero-lead">
-          수기 일지·엑셀 대신 <strong>전자 실적</strong>을 만듭니다.
-          환경 영향 평가·사업 결과 보고에 바로 쓰는 <strong>월 구독(SaaS) 관제</strong>입니다.
-        </p>
-        <div class="stat-row">
+        <span class="concept-badge">Concept 02</span>
+      </header>
+
+      <section class="hero">
+        <h1>손으로 쓰지 않는 살포,<br /><span>GPS·IoT가 증명하는 해양 관제</span></h1>
+        <p class="lead">수기 일지·엑셀 대신 <strong>전자 실적</strong>을 만듭니다. 환경 영향 평가·사업 결과 보고에 바로 쓰는 <strong>월 구독(SaaS) SeaRestore</strong> 관제입니다.</p>
+      </section>
+
+      <section class="stats">
           <div class="stat"><b>ha</b><span>면적 자동 산출</span></div>
           <div class="stat"><b>SaaS</b><span>초기 구축 최소</span></div>
           <div class="stat"><b>IoT</b><span>직접 연동 PoC</span></div>
-        </div>
-      </div>
-    </header>
+      </section>
 
-    <main class="body">
-      <section class="split">
-        <div class="col-text">
-          <div class="shift-card was">
-            <h2>AS-IS · 수기·분리</h2>
-            <ul>
-              <li>살포 면적·항적 <b>엑셀·일지</b></li>
-              <li>파종 장치 ↔ 관제 <b>연동 불가</b></li>
-              <li>사후 보고, <b>실시간 공백</b></li>
-            </ul>
-          </div>
-          <div class="shift-card now">
-            <h2>TO-BE · SeaRestore</h2>
-            <ul>
-              <li><b>사업 기간</b> 월 구독</li>
-              <li>투하 <b>좌표·ha 실시간</b></li>
-              <li>기상·항로 <b>AI 로그</b></li>
-            </ul>
-          </div>
-          <div class="flow">
-            <div class="flow-step"><span class="num">01</span><span class="txt">IoT<br />투하</span></div>
-            <span class="flow-arrow">›</span>
-            <div class="flow-step"><span class="num">02</span><span class="txt">클라우드<br />좌표</span></div>
-            <span class="flow-arrow">›</span>
-            <div class="flow-step"><span class="num">03</span><span class="txt">관제<br />대시보드</span></div>
-          </div>
+      <section class="features">
+        <div class="feature-card">
+          <h3>📡 IoT 다이렉트 연동</h3>
+          <p>펌웨어 단말 투하 신호 → 위·경도·면적(ha)이 웹 관제에 즉시 반영됩니다.</p>
         </div>
-        <div class="col-visual">
-          <div class="device">
-            <span class="device-notch"></span>
-            <img src="assets/brochure-spotvibe-ai-route.png" alt="ENX 관제 UI" />
+        <div class="feature-card">
+          <h3>☁️ 월 구독 SaaS</h3>
+          <p>사업 기간 단위 URL 관제. 대규모 온프레미스 구축 없이 PoC·실증을 시작합니다.</p>
+        </div>
+        <div class="feature-card">
+          <h3>🌊 전자 실적 증빙</h3>
+          <p>살포 항적·면적을 실시간 로그로 남겨 블루카본·생태복원 보고에 활용합니다.</p>
+        </div>
+      </section>
+
+      <section class="visual">
+        <div class="device">
+          <img src="assets/brochure-spotvibe-ai-route.png" alt="시연 화면" />
+        </div>
+        <div class="visual-notes">
+          <div class="note">
+            <strong>ENX 관제 UI</strong>
+            <span>지도·AI·실시간 레이어 시연 캡처입니다.</span>
           </div>
-          <div class="caption-list">
-            <p class="cap"><strong>ENX 관제 UI</strong> — 지도·AI·실시간 레이어(시연 캡처)</p>
-            <p class="cap"><strong>SeaRestore 전용</strong> — 살포·ha 화면은 PoC 시 별도 제공</p>
-            <p class="cap"><strong>망분리·전용망</strong> — 기관 환경에 맞춘 확장</p>
+          <div class="note">
+            <strong>SeaRestore 전용 화면</strong>
+            <span>살포·ha 대시보드는 PoC 시 별도 제공합니다.</span>
           </div>
         </div>
       </section>
 
-      <section class="proof">
-        <span class="ico">📟</span>
-        <div>
-          <h3>IoT ↔ 웹 서버 다이렉트 연동(PoC) 완료</h3>
-          <p>펌웨어 단말 투하 신호 → 위도·경도·면적(ha) 즉시 반영. 이원 수집 원천기술(특허 출원 10-2026-0086686).</p>
+      <section class="impact-box">
+        <h4>기대 효과 및 협력 모델</h4>
+        <p>환경부·해양수산부·지자체 해양 생태복원·연안 정화 과제와 PoC 협의. IoT↔클라우드 이원 수집 원천기술(특허 출원)을 기반으로 실증을 확장합니다.</p>
+      </section>
+
+      <footer class="footer">
+        <div class="footer-main">
+          <p class="company">(주)이앤엑스 ENX · SeaRestore</p>
+          <p class="meta">대표 박원평 · 302-47-00920<br />
+            <a href="tel:01046392673">010-4639-2673</a> · <a href="mailto:tseizou@naver.com">tseizou@naver.com</a></p>
         </div>
-      </section>
-
-      <section class="cap-grid">
-        <div class="cap-item"><div class="ico">☁️</div><h4>SaaS</h4><p>URL 즉시 관제</p></div>
-        <div class="cap-item"><div class="ico">📡</div><h4>IoT</h4><p>조작·누락 방지</p></div>
-        <div class="cap-item"><div class="ico">📊</div><h4>면적</h4><p>ha 자동 근사</p></div>
-        <div class="cap-item"><div class="ico">🌤️</div><h4>AI 항로</h4><p>기상·안전 보조</p></div>
-      </section>
-
-      <p class="legal">※ <em>블루카본</em>·연안 정화·해양 생태복원 과제 PoC 협의</p>
-    </main>
-
-    <footer class="foot">
-      <div class="foot-info">
-        <h2>(주)이앤엑스 ENX</h2>
-        <p class="sub">대표이사 박원평</p>
-        <p>302-47-00920 · <a href="tel:01046392673">010-4639-2673</a> · <a href="mailto:tseizou@naver.com">tseizou@naver.com</a></p>
-      </div>
-      <div class="foot-qr">
-        <img src="assets/brochure-qr-spotvibe.png" alt="시연 QR" />
-        <span>시연 QR</span>
-      </div>
-      <div class="foot-stamp">
-        <small>특허 출원</small>
-        <strong>10-2026-0086686</strong>
-      </div>
-    </footer>
+        <div class="footer-qr">
+          <img src="assets/brochure-qr-spotvibe.png" alt="시연 QR" width="44" height="44" />
+          <span>시연 QR</span>
+        </div>
+        <div class="footer-stamp">
+          <small>특허 출원</small>
+          <strong>10-2026-0086686</strong>
+        </div>
+      </footer>
+    </div>
   </article>
 </body>
 </html>

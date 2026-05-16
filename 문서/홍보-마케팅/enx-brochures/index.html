@@ -1,47 +1,26 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ENX 1장 제안 브로슈어</title>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;900&family=Noto+Sans+KR:wght@700;900&display=swap" rel="stylesheet" />
   <style>
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      margin: 0;
       min-height: 100vh;
-      font-family: "Noto Sans KR", "Malgun Gothic", sans-serif;
-      background: #0a0a0e;
-      color: #e2e8f0;
-      padding: 48px 20px 64px;
+      background: #0a0b0f;
+      color: #f8fafc;
+      font-family: "Noto Sans KR", "Inter", sans-serif;
+      padding: 48px 20px;
     }
-    .wrap { max-width: 520px; margin: 0 auto; }
-    .logo-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 28px;
-    }
-    .logo-row img {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-    }
-    h1 { margin: 0; font-size: 1.4rem; font-weight: 900; }
+    .wrap { max-width: 480px; margin: 0 auto; }
+    .top { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+    .top img { width: 48px; height: 48px; border-radius: 12px; }
+    h1 { font-size: 1.35rem; font-weight: 900; }
     h1 span { color: #00f0ff; }
-    .lead {
-      color: #94a3b8;
-      font-size: 0.9rem;
-      line-height: 1.55;
-      margin-bottom: 28px;
-    }
-    .lead code {
-      background: #1e293b;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 0.82rem;
-      color: #00f0ff;
-    }
+    .lead { color: #94a3b8; font-size: 0.88rem; line-height: 1.55; margin-bottom: 24px; }
+    .lead code { background: #1e293b; padding: 2px 8px; border-radius: 4px; color: #00f0ff; font-size: 0.8rem; }
     a.card {
       display: block;
       padding: 18px 20px;
@@ -51,64 +30,53 @@
       color: inherit;
       border: 1px solid rgba(255,255,255,0.08);
       background: rgba(255,255,255,0.03);
-      transition: transform 0.15s, border-color 0.15s;
+      transition: border-color 0.15s, transform 0.15s;
     }
-    a.card:hover {
-      transform: translateY(-2px);
-      border-color: rgba(0,240,255,0.35);
-    }
-    a.card .concept {
-      font-size: 0.72rem;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      margin-bottom: 6px;
-    }
+    a.card:hover { border-color: rgba(0,240,255,0.35); transform: translateY(-2px); }
+    .tag { font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em; margin-bottom: 6px; }
     a.card strong { display: block; font-size: 1.05rem; margin-bottom: 6px; }
     a.card span { font-size: 0.85rem; color: #94a3b8; line-height: 1.45; }
-    .fire .concept { color: #ff6b4a; }
-    .env .concept { color: #2dd4bf; }
-    .vi .concept { color: #a78bfa; }
+    .fire .tag { color: #ff6b6b; }
+    .env .tag { color: #2dd4bf; }
+    .vi .tag { color: #a855f7; }
     .tip {
-      margin-top: 28px;
+      margin-top: 24px;
       padding: 14px 16px;
       border-radius: 10px;
-      background: rgba(0,240,255,0.06);
       border: 1px solid rgba(0,240,255,0.18);
+      background: rgba(0,240,255,0.06);
       font-size: 0.82rem;
-      line-height: 1.5;
       color: #94a3b8;
+      line-height: 1.5;
     }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="logo-row">
+    <div class="top">
       <img src="assets/enx-app-icon.png" alt="" width="48" height="48" />
-      <h1>ENX <span>1장 제안</span> 브로슈어</h1>
+      <h1>ENX <span>1장 제안</span></h1>
     </div>
     <p class="lead">
-      수신처별 <b>한 줄 컨셉</b> + SpotVibe 다크 UI DNA · A4 인쇄용<br />
+      다크 A4 제안서 · 수신처별 컨셉<br />
       <code>npm run brochures</code> → <code>http://127.0.0.1:8765/</code>
     </p>
     <a class="card fire" href="01-fire.html">
-      <p class="concept">CONCEPT 01</p>
+      <p class="tag">CONCEPT 01</p>
       <strong>선행 안전망 — 소방·재난안전</strong>
-      <span>119 전 3km 이웃 SOS · 소화기 시민 레이어 · 보조 채널</span>
+      <span>119 전 3km SOS · 소화기 시민 레이어 · AI 검증</span>
     </a>
     <a class="card env" href="02-env.html">
-      <p class="concept">CONCEPT 02</p>
-      <strong>실적이 증명되는 바다 — 환경·해양</strong>
-      <span>SeaRestore SaaS · IoT 살포 ha 증빙 · 월 구독</span>
+      <p class="tag">CONCEPT 02</p>
+      <strong>실적이 증명되는 바다 — SeaRestore</strong>
+      <span>IoT 살포 · ha 증빙 · 월 구독 SaaS</span>
     </a>
     <a class="card vi" href="03-vi.html">
-      <p class="concept">CONCEPT 03</p>
-      <strong>보이지 않아도, 들리게 — 시각장애인</strong>
-      <span>🦯 마커 · TTS 이웃 메시지 · 구청 연계 로드맵</span>
+      <p class="tag">CONCEPT 03</p>
+      <strong>보이지 않아도, 들리게 — 접근성</strong>
+      <span>🦯 마커 · TTS 이웃 메시지 · 구청 연계</span>
     </a>
-    <p class="tip">
-      Chrome·Edge 권장. Cursor 내장 브라우저는 한글 경로 URL이 깨질 수 있습니다.
-      인쇄: A4 · 여백 없음 · 배경 그래픽 체크.
-    </p>
+    <p class="tip">Chrome·Edge 권장 · <code>01-fire.html</code> 등 영문 파일명 사용. 인쇄: A4 · 여백 없음 · 배경 ON.</p>
   </div>
 </body>
 </html>

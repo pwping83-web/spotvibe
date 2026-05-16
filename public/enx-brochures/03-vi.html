@@ -1,119 +1,94 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>시각장애인 — 지금여기 | ENX</title>
+  <title>ENX 제안서 - 시각장애인·접근성</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="enx-brochure.css" />
 </head>
-<body>
+<body class="theme-vi">
   <p class="screen-bar no-print">
-    <b>03 · 보이지 않아도, 들리게</b> — 시각장애인·복지·지자체<br />
+    <b>03 · 보이지 않아도, 들리게 — 복지·지자체</b><br />
     A4 · 여백 없음 · 배경 그래픽 ON
     <button type="button" onclick="window.print()">PDF 저장 / 인쇄</button>
   </p>
 
-  <article class="sheet theme-vi">
-    <header class="hero">
-      <div class="hero-grid" aria-hidden="true"></div>
-      <div class="hero-inner">
-        <div class="hero-meta">
-          <div class="brand">
-            <img src="assets/enx-app-icon.png" alt="" width="30" height="30" />
-            <div class="brand-text">지금여기 SpotVibe<small>(주)이앤엑스 ENX</small></div>
-          </div>
-          <span class="audience-badge">시각장애인·접근성</span>
+  <article class="a4-canvas">
+    <div class="content-wrapper">
+      <header class="header">
+        <div class="header-brand">
+          <img src="assets/enx-app-icon.png" alt="" width="36" height="36" />
+          <div class="logo">ENX<small>지금여기 SpotVibe</small></div>
         </div>
-        <p class="concept-label">CONCEPT · 보이지 않아도, 들리게</p>
-        <h1>보이지 않아도,<br /><em>이웃 목소리</em>로 닿는다</h1>
-        <p class="hero-lead">
-          🦯 전용 마커·근접 알림·<strong>짧은 메시지 → TTS 음성</strong>.
-          구청 승인 연계 로드맵, <strong>MVP 작동 중</strong>입니다.
-        </p>
-        <div class="stat-row">
-          <div class="stat"><b>TTS</b><span>음성 안내</span></div>
+        <span class="concept-badge">Concept 03</span>
+      </header>
+
+      <section class="hero">
+        <h1>보이지 않아도,<br /><span>이웃 목소리로 닿는 접근성</span></h1>
+        <p class="lead">🦯 전용 마커·근접 알림·<strong>짧은 메시지 → TTS 음성</strong>. 구청 승인 연계 로드맵과 함께 <strong>MVP가 작동 중</strong>입니다.</p>
+      </section>
+
+      <section class="stats">
+          <div class="stat"><b>TTS</b><span>Web Speech</span></div>
           <div class="stat"><b>opt-in</b><span>수신 동의</span></div>
           <div class="stat"><b>~135m</b><span>근접 알림</span></div>
-        </div>
-      </div>
-    </header>
+      </section>
 
-    <main class="body">
-      <section class="split">
-        <div class="col-text">
-          <div class="shift-card was">
-            <h2>AS-IS · 기존 한계</h2>
-            <ul>
-              <li>스스로 SOS <b>발신 어려움</b></li>
-              <li>주변 시민 <b>존재·위치 모름</b></li>
-              <li>일반 지도 <b>음성 UX 부족</b></li>
-            </ul>
-          </div>
-          <div class="shift-card now">
-            <h2>TO-BE · 지금여기</h2>
-            <ul>
-              <li><b>🦯·♿ 특별 마커</b></li>
-              <li>이웃 <b>Web Speech TTS</b></li>
-              <li><b>1시간 6건</b> 스팸 완화</li>
-            </ul>
-          </div>
-          <div class="flow">
-            <div class="flow-step"><span class="num">01</span><span class="txt">마커<br />인지</span></div>
-            <span class="flow-arrow">›</span>
-            <div class="flow-step"><span class="num">02</span><span class="txt">메시지<br />전송</span></div>
-            <span class="flow-arrow">›</span>
-            <div class="flow-step"><span class="num">03</span><span class="txt">음성<br />안내</span></div>
-          </div>
+      <section class="features">
+        <div class="feature-card">
+          <h3>🦯 특별 마커</h3>
+          <p>시각·이동약자 카테고리별 식별. 보호망·SOS와 연계된 취약계층 안전 UX.</p>
         </div>
-        <div class="col-visual">
-          <div class="device">
-            <span class="device-notch"></span>
-            <img src="assets/brochure-spotvibe-vi.png" alt="시각장애인·이동약자 마커" />
+        <div class="feature-card">
+          <h3>🔊 이웃 음성 안내</h3>
+          <p>「이웃 도움 음성」 동의 시 이웃 메시지를 한국어 TTS로 읽어 줍니다.</p>
+        </div>
+        <div class="feature-card">
+          <h3>🏛️ 구청·RLS 연계</h3>
+          <p>승인·모더레이션·스팸 완화(1시간 6건)로 신뢰 가능한 PoC를 설계합니다.</p>
+        </div>
+      </section>
+
+      <section class="visual">
+        <div class="device">
+          <img src="assets/brochure-spotvibe-vi.png" alt="시연 화면" />
+        </div>
+        <div class="visual-notes">
+          <div class="note">
+            <strong>Realtime·RLS</strong>
+            <span>Supabase 기반 실시간 메시지와 권한 분리.</span>
           </div>
-          <div class="caption-list">
-            <p class="cap"><strong>보호망 · SOS</strong> — 취약계층·긴급 기능 연계</p>
-            <p class="cap"><strong>시각·이동약자</strong> — 카테고리별 식별 마커</p>
-            <p class="cap"><strong>근접 알림</strong> — 진동·짧은 알림음(opt-in)</p>
+          <div class="note">
+            <strong>QR 웹 접속</strong>
+            <span>별도 앱 설치 없이 현장 체험이 가능합니다.</span>
           </div>
         </div>
       </section>
 
-      <section class="proof">
-        <span class="ico">🔊</span>
-        <div class="proof-body">
-          <h3>MVP — 이웃 메시지를 TTS로 읽어 줌</h3>
-          <p>마이 「이웃 도움 음성」 동의 시 이웃 메시지를 한국어 Web Speech로 안내. Realtime·RLS 기반.</p>
+      <section class="impact-box">
+        <h4>기대 효과 및 협력 모델</h4>
+        <p>한국시각장애인연합회·지자체 복지·접근성 사업과 PoC 협의. 지도 앱이 아닌 「들리는 이웃 안전망」으로 차별화합니다.</p>
+      </section>
+
+      <footer class="footer">
+        <div class="footer-main">
+          <p class="company">(주)이앤엑스 ENX · 지금여기</p>
+          <p class="meta">대표 박원평 · 302-47-00920<br />
+            <a href="tel:01046392673">010-4639-2673</a> · <a href="mailto:tseizou@naver.com">tseizou@naver.com</a></p>
         </div>
-      </section>
-
-      <section class="cap-grid">
-        <div class="cap-item"><div class="ico">🦯</div><h4>마커</h4><p>카테고리별</p></div>
-        <div class="cap-item"><div class="ico">🔊</div><h4>음성</h4><p>Web Speech</p></div>
-        <div class="cap-item"><div class="ico">✉️</div><h4>메시지</h4><p>마커→전송</p></div>
-        <div class="cap-item"><div class="ico">🏛️</div><h4>구청</h4><p>승인·RLS</p></div>
-      </section>
-
-      <p class="legal">※ MVP·opt-in · 한국시각장애인연합회 PoC 협의</p>
-    </main>
-
-    <footer class="foot">
-      <div class="foot-info">
-        <h2>(주)이앤엑스 ENX · 지금여기</h2>
-        <p class="sub">대표이사 박원평</p>
-        <p>302-47-00920 · <a href="tel:01046392673">010-4639-2673</a> · <a href="mailto:tseizou@naver.com">tseizou@naver.com</a></p>
-      </div>
-      <div class="foot-qr">
-        <img src="assets/brochure-qr-spotvibe.png" alt="시연 QR" />
-        <span>시연 QR</span>
-      </div>
-      <div class="foot-stamp">
-        <small>특허 출원</small>
-        <strong>10-2026-0086971</strong>
-      </div>
-    </footer>
+        <div class="footer-qr">
+          <img src="assets/brochure-qr-spotvibe.png" alt="시연 QR" width="44" height="44" />
+          <span>시연 QR</span>
+        </div>
+        <div class="footer-stamp">
+          <small>특허 출원</small>
+          <strong>10-2026-0086971</strong>
+        </div>
+      </footer>
+    </div>
   </article>
 </body>
 </html>
