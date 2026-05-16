@@ -7,6 +7,7 @@
     "build": "vite build",
     "dev": "vite",
     "open:app": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/open-app.ps1",
+    "brochures": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/open-enx-brochures.ps1",
     "git:watch": "node scripts/git-autowatch.mjs",
     "git:sync": "node scripts/git-sync-once.mjs",
     "review:pdf": "node scripts/kakao-review-bundle-pdf.mjs",

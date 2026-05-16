@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>이앤엑스(ENX) 해양 종자 살포 스마트 관제 — 환경부·해양수산부 제안</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy: #0a2540;
+      --blue: #1a73e8;
+      --green: #0d9488;
+      --red: #d93025;
+      --yellow: #fbbc04;
+      --gray: #e2e8f0;
+      --bg-light: #f8fafc;
+    }
+
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Noto Sans KR", "Malgun Gothic", sans-serif;
+      background-color: #555;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .print-hint {
+      text-align: center;
+      padding: 10px;
+      color: #fff;
+      font-size: 14px;
+    }
+
+    .print-hint button {
+      padding: 8px 16px;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .a4-page {
+      width: 210mm;
+      height: 297mm;
+      max-height: 297mm;
+      background: #fff;
+      margin: 10px auto;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header {
+      background: var(--navy);
+      color: #fff;
+      padding: 12mm 15mm 9mm;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .tag {
+      display: inline-block;
+      background: var(--green);
+      color: #fff;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 11px;
+      margin-bottom: 10px;
+      letter-spacing: 0.5px;
+    }
+
+    .title {
+      font-size: 25px;
+      font-weight: 900;
+      margin: 0 0 6px;
+      line-height: 1.3;
+      letter-spacing: -1px;
+    }
+
+    .title span {
+      color: var(--yellow);
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #a8c7fa;
+      margin: 0;
+      font-weight: 400;
+      line-height: 1.45;
+    }
+
+    .content {
+      padding: 8mm 15mm;
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+
+    .vs-container {
+      display: flex;
+      width: 100%;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      flex-shrink: 0;
+      border: 1px solid var(--gray);
+    }
+
+    .vs-box {
+      flex: 1;
+      padding: 11px 14px;
+    }
+
+    .vs-box.old {
+      background: #fff5f5;
+      border-top: 4px solid var(--red);
+      border-right: 1px solid var(--gray);
+    }
+
+    .vs-box.new {
+      background: #f0fdf4;
+      border-top: 4px solid var(--green);
+    }
+
+    .vs-title {
+      font-size: 12.5px;
+      font-weight: 900;
+      margin: 0 0 7px 0;
+    }
+
+    .old .vs-title {
+      color: var(--red);
+    }
+
+    .new .vs-title {
+      color: var(--green);
+    }
+
+    .vs-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 11px;
+      line-height: 1.48;
+      font-weight: 700;
+    }
+
+    .vs-list li {
+      margin-bottom: 4px;
+      padding-left: 16px;
+      position: relative;
+      word-break: keep-all;
+    }
+
+    .vs-list li:last-child {
+      margin-bottom: 0;
+    }
+
+    .old .vs-list li::before {
+      content: "✕";
+      position: absolute;
+      left: 0;
+      color: var(--red);
+      font-weight: 900;
+    }
+
+    .new .vs-list li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: var(--green);
+      font-weight: 900;
+    }
+
+    .product-visual {
+      width: 100%;
+      border: 2px solid var(--navy);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      position: relative;
+      flex-shrink: 0;
+      background: #0f172a;
+    }
+
+    .product-visual img {
+      width: 100%;
+      height: 72mm;
+      object-fit: cover;
+      object-position: top center;
+      display: block;
+    }
+
+    .visual-placeholder {
+      height: 72mm;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      text-align: center;
+      color: #94a3b8;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .visual-label {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(10, 37, 64, 0.88);
+      color: #fff;
+      padding: 6px 12px;
+      font-size: 10px;
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .poc-banner {
+      width: 100%;
+      background: linear-gradient(135deg, var(--yellow) 0%, #f57f17 100%);
+      border-radius: 8px;
+      padding: 11px 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: #000;
+      box-shadow: 0 4px 12px rgba(251, 188, 4, 0.2);
+      flex-shrink: 0;
+    }
+
+    .poc-icon {
+      font-size: 24px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .poc-text h3 {
+      font-size: 14px;
+      font-weight: 900;
+      margin: 0 0 3px 0;
+    }
+
+    .poc-text p {
+      font-size: 11px;
+      margin: 0;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+      width: 100%;
+      flex-shrink: 0;
+    }
+
+    .feature-card {
+      background: #fff;
+      border: 1px solid var(--gray);
+      border-radius: 6px;
+      padding: 9px 11px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .f-icon {
+      background: #e8f0fe;
+      width: 34px;
+      height: 34px;
+      border-radius: 6px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 17px;
+      flex-shrink: 0;
+    }
+
+    .f-text h4 {
+      margin: 0 0 2px 0;
+      font-size: 12px;
+      font-weight: 900;
+      color: var(--navy);
+    }
+
+    .f-text p {
+      margin: 0;
+      font-size: 10.5px;
+      color: #555;
+      line-height: 1.38;
+      word-break: keep-all;
+      font-weight: 500;
+    }
+
+    .equip-line {
+      width: 100%;
+      flex-shrink: 0;
+      padding: 7px 11px;
+      text-align: center;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--navy);
+      background: var(--bg-light);
+      border: 1px solid #d2e3fc;
+      border-radius: 6px;
+    }
+
+    .equip-line em {
+      font-style: normal;
+      font-weight: 900;
+      color: var(--green);
+    }
+
+    .footer {
+      background: var(--navy);
+      color: #fff;
+      padding: 8mm 15mm;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .footer-logo-img {
+      width: 46px;
+      height: 46px;
+      border-radius: 8px;
+      object-fit: cover;
+      flex-shrink: 0;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      background: #1e3a5f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 900;
+      color: var(--yellow);
+    }
+
+    .company-info h2 {
+      margin: 0 0 2px 0;
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .company-info .rep {
+      margin: 0 0 4px 0;
+      font-size: 11px;
+      color: var(--yellow);
+      font-weight: 700;
+    }
+
+    .contact-lines {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 10px;
+      color: #c5d5f7;
+      line-height: 1.5;
+    }
+
+    .contact-lines li strong {
+      display: inline-block;
+      min-width: 3.8em;
+      color: #a8c7fa;
+    }
+
+    .contact-lines a {
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .footer-qr img {
+      display: block;
+      width: 58px;
+      height: 58px;
+      border-radius: 6px;
+      background: #fff;
+      padding: 3px;
+    }
+
+    .footer-qr span {
+      display: block;
+      margin-top: 4px;
+      font-size: 8px;
+      color: #a8c7fa;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .patent-stamp {
+      border: 2px solid var(--yellow);
+      padding: 7px 10px;
+      border-radius: 6px;
+      text-align: center;
+      color: var(--yellow);
+      transform: rotate(-1.5deg);
+      flex-shrink: 0;
+    }
+
+    .patent-stamp div:first-child {
+      font-size: 9px;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    .patent-stamp div:last-child {
+      font-size: 11.5px;
+      font-weight: 900;
+    }
+
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+
+      body {
+        background: #fff;
+      }
+
+      .a4-page {
+        margin: 0;
+        box-shadow: none;
+      }
+
+      .header,
+      .tag,
+      .poc-banner,
+      .f-icon,
+      .footer,
+      .vs-box,
+      .patent-stamp,
+      .equip-line {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <p class="print-hint no-print">
+    <b>환경부·해양수산부 제출용</b> · 인쇄: A4 · 여백 없음 · 배경 그래픽 체크
+    <button type="button" onclick="window.print()">인쇄 / PDF 저장</button>
+  </p>
+
+  <article class="a4-page">
+    <header class="header">
+      <span class="tag">환경부·해양수산부 · 해양 생태복원·모니터링 사업 제안 (1장)</span>
+      <h1 class="title">
+        초기 SI 부담 최소화, <span>월 구독형(SaaS)</span><br />
+        해양 종자 살포 스마트 관제 솔루션
+      </h1>
+      <p class="subtitle">
+        해양 생태계 복원 실적의 <b>위치·면적·투하량</b>을 GPS·IoT로 자동 증빙 ·
+        수기 집계·분리 시스템 대비 예산·검증 공백 해소
+      </p>
+    </header>
+
+    <main class="content">
+      <section class="vs-container" aria-label="기존 방식과 ENX 제안">
+        <div class="vs-box old">
+          <h2 class="vs-title">⚠️ 기존 수기·분리 운영</h2>
+          <ul class="vs-list">
+            <li>살포 면적·선박 항적 <b>엑셀·현장 일지 수기</b></li>
+            <li>파종 장치와 관제 SW <b>별도 구축·연동 불가</b></li>
+            <li>환경 영향 <b>사후 보고 중심</b>, 실시간 모니터링 공백</li>
+          </ul>
+        </div>
+        <div class="vs-box new">
+          <h2 class="vs-title">💡 ENX SeaRestore 관제</h2>
+          <ul class="vs-list">
+            <li><b>사업 기간 중심 월 구독</b> (초기 구축 리스크 최소)</li>
+            <li>IoT 단말 ↔ 클라우드 <b>투하 좌표·면적(ha) 실시간</b></li>
+            <li>기상·항로 AI 연동으로 <b>작업 안전·재현 가능 로그</b></li>
+          </ul>
+        </div>
+      </section>
+
+      <figure class="product-visual">
+        <div class="visual-placeholder">
+          assets/brochure-dashboard-searestore.png<br />
+          (관제 대시보드 캡처를 이 경로에 넣으면 인쇄 시 표시됩니다)
+        </div>
+        <figcaption class="visual-label">▲ ENX SeaRestore — 그리드 항로·기상 AI·살포 궤적 실시간 관제 화면</figcaption>
+      </figure>
+
+      <section class="poc-banner">
+        <div class="poc-icon" aria-hidden="true">📟</div>
+        <div class="poc-text">
+          <h3>IoT ↔ 웹 서버 다이렉트 연동(PoC) 완료</h3>
+          <p>
+            자체 펌웨어 단말의 종자 투하 신호가 중앙 대시보드의 위도·경도·면적 데이터로 즉시 반영되는 무결점 통신을 실증했습니다.
+            환경 영향 평가·사업 결과 보고용 <b>객관적 전자 기록</b>으로 활용 가능합니다.
+          </p>
+        </div>
+      </section>
+
+      <div class="grid-4">
+        <div class="feature-card">
+          <div class="f-icon" aria-hidden="true">☁️</div>
+          <div class="f-text">
+            <h4>SaaS 즉시 도입</h4>
+            <p>별도 서버 구축 없이 URL 접속으로 관제 개시 (망분리·전용망 확장 협의)</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="f-icon" aria-hidden="true">📡</div>
+          <div class="f-text">
+            <h4>IoT 이원 수집</h4>
+            <p>현장 기계 신호 직접 수집(특허 출원) — 조작·누락 방지</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="f-icon" aria-hidden="true">📊</div>
+          <div class="f-text">
+            <h4>면적(ha) 자동 산출</h4>
+            <p>투하 좌표 지도 표출·작업 구역 면적 자동 근사</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="f-icon" aria-hidden="true">🌤️</div>
+          <div class="f-text">
+            <h4>AI 기상·항로 보조</h4>
+            <p>기상청 API 연동 안전 경보·장애물 회피 최적 항로</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="equip-line">
+        ※ <em>해양 생태복원</em>·<em>연안 정화</em>·<em>블루카본</em> 등 환경부·지자체 과제의
+        <em>실적 증빙·모니터링 대시보드</em> 맞춤 연동·PoC 협의 가능
+      </p>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-brand">
+        <div class="footer-logo-img" aria-hidden="true">ENX</div>
+        <div class="company-info">
+          <h2>(주)이앤엑스 ENX</h2>
+          <p class="rep">대표이사 박원평</p>
+          <ul class="contact-lines">
+            <li><strong>사업자</strong> 302-47-00920</li>
+            <li><strong>연락처</strong> <a href="tel:01046392673">010-4639-2673</a></li>
+            <li><strong>이메일</strong> <a href="mailto:tseizou@naver.com">tseizou@naver.com</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-qr">
+        <img src="assets/brochure-qr-spotvibe.png" alt="ENX 시연 QR" />
+        <span>관제·시연 QR</span>
+      </div>
+      <div class="patent-stamp">
+        <div>단말 이원 수집 관제 원천 기술</div>
+        <div>특허 출원 10-2026-0086686호</div>
+      </div>
+    </footer>
+  </article>
+</body>
+
+</html>
