@@ -1,563 +1,120 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>이앤엑스(ENX) 지금여기(SpotVibe) — 소방·재난안전 협력 제안</title>
+  <title>소방·재난안전 — 지금여기 | ENX</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --navy: #0a2540;
-      --blue: #1a73e8;
-      --fire: #dc2626;
-      --yellow: #fbbc04;
-      --gray: #e2e8f0;
-      --bg-light: #f8fafc;
-    }
-
-    @page {
-      size: A4 portrait;
-      margin: 0;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: "Noto Sans KR", "Malgun Gothic", sans-serif;
-      background: #555;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .print-hint {
-      text-align: center;
-      padding: 10px;
-      color: #fff;
-      font-size: 14px;
-    }
-
-    .print-hint button {
-      padding: 8px 16px;
-      background: var(--fire);
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: inherit;
-    }
-
-    .a4-page {
-      width: 210mm;
-      height: 297mm;
-      max-height: 297mm;
-      background: #fff;
-      margin: 10px auto;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    .header {
-      background: linear-gradient(180deg, #1a0505 0%, var(--navy) 100%);
-      color: #fff;
-      padding: 12mm 15mm 9mm;
-      text-align: center;
-      flex-shrink: 0;
-    }
-
-    .tag {
-      display: inline-block;
-      background: var(--fire);
-      color: #fff;
-      padding: 4px 14px;
-      border-radius: 20px;
-      font-weight: 700;
-      font-size: 11px;
-      margin-bottom: 10px;
-    }
-
-    .title {
-      font-size: 24px;
-      font-weight: 900;
-      margin: 0 0 6px;
-      line-height: 1.32;
-      letter-spacing: -0.8px;
-    }
-
-    .title span {
-      color: var(--yellow);
-    }
-
-    .subtitle {
-      font-size: 12.5px;
-      color: #fecaca;
-      margin: 0;
-      line-height: 1.45;
-    }
-
-    .content {
-      padding: 8mm 15mm;
-      flex: 1;
-      min-height: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .vs-container {
-      display: flex;
-      border-radius: 8px;
-      overflow: hidden;
-      border: 1px solid var(--gray);
-      flex-shrink: 0;
-    }
-
-    .vs-box {
-      flex: 1;
-      padding: 10px 13px;
-    }
-
-    .vs-box.old {
-      background: #fafafa;
-      border-top: 4px solid #9ca3af;
-      border-right: 1px solid var(--gray);
-    }
-
-    .vs-box.new {
-      background: #fff7ed;
-      border-top: 4px solid var(--fire);
-    }
-
-    .vs-title {
-      font-size: 12px;
-      font-weight: 900;
-      margin: 0 0 6px;
-    }
-
-    .old .vs-title {
-      color: #4b5563;
-    }
-
-    .new .vs-title {
-      color: var(--fire);
-    }
-
-    .vs-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      font-size: 10.8px;
-      line-height: 1.48;
-      font-weight: 700;
-    }
-
-    .vs-list li {
-      margin-bottom: 4px;
-      padding-left: 15px;
-      position: relative;
-      word-break: keep-all;
-    }
-
-    .old .vs-list li::before {
-      content: "—";
-      position: absolute;
-      left: 0;
-      color: #9ca3af;
-    }
-
-    .new .vs-list li::before {
-      content: "✓";
-      position: absolute;
-      left: 0;
-      color: var(--fire);
-      font-weight: 900;
-    }
-
-    .product-visual {
-      border: 2px solid var(--navy);
-      border-radius: 8px;
-      overflow: hidden;
-      position: relative;
-      flex-shrink: 0;
-      background: #0f172a;
-    }
-
-    .product-visual img {
-      width: 100%;
-      height: 68mm;
-      object-fit: cover;
-      object-position: top center;
-      display: block;
-    }
-
-    .visual-placeholder {
-      height: 68mm;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 14px;
-      text-align: center;
-      color: #94a3b8;
-      font-size: 11.5px;
-      font-weight: 700;
-      line-height: 1.5;
-    }
-
-    .visual-label {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(127, 29, 29, 0.9);
-      color: #fff;
-      padding: 5px 10px;
-      font-size: 9.5px;
-      font-weight: 700;
-      text-align: right;
-    }
-
-    .poc-banner {
-      background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-      border: 1px solid #fca5a5;
-      border-radius: 8px;
-      padding: 10px 13px;
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      flex-shrink: 0;
-    }
-
-    .poc-icon {
-      font-size: 22px;
-    }
-
-    .poc-text h3 {
-      font-size: 13px;
-      font-weight: 900;
-      margin: 0 0 2px;
-      color: #7f1d1d;
-    }
-
-    .poc-text p {
-      font-size: 10.5px;
-      margin: 0;
-      font-weight: 700;
-      line-height: 1.42;
-      color: #450a0a;
-    }
-
-    .grid-4 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 7px;
-      flex-shrink: 0;
-    }
-
-    .feature-card {
-      border: 1px solid var(--gray);
-      border-radius: 6px;
-      padding: 8px 10px;
-      display: flex;
-      gap: 9px;
-      align-items: center;
-    }
-
-    .f-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 6px;
-      background: #fee2e2;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      flex-shrink: 0;
-    }
-
-    .f-text h4 {
-      margin: 0 0 2px;
-      font-size: 11.5px;
-      font-weight: 900;
-      color: var(--navy);
-    }
-
-    .f-text p {
-      margin: 0;
-      font-size: 10px;
-      color: #555;
-      line-height: 1.38;
-      word-break: keep-all;
-    }
-
-    .equip-line {
-      text-align: center;
-      font-size: 10.5px;
-      font-weight: 700;
-      color: var(--navy);
-      background: var(--bg-light);
-      border: 1px solid #fecaca;
-      border-radius: 6px;
-      padding: 7px 10px;
-      flex-shrink: 0;
-    }
-
-    .equip-line em {
-      font-style: normal;
-      font-weight: 900;
-      color: var(--fire);
-    }
-
-    .footer {
-      background: var(--navy);
-      color: #fff;
-      padding: 8mm 15mm;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-shrink: 0;
-    }
-
-    .footer-brand {
-      display: flex;
-      gap: 11px;
-      flex: 1;
-      min-width: 0;
-    }
-
-    .footer-logo-img {
-      width: 44px;
-      height: 44px;
-      border-radius: 8px;
-      background: #7f1d1d;
-      border: 2px solid rgba(255, 255, 255, 0.15);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      font-weight: 900;
-      color: var(--yellow);
-      flex-shrink: 0;
-    }
-
-    .company-info h2 {
-      margin: 0 0 2px;
-      font-size: 13.5px;
-      font-weight: 900;
-    }
-
-    .company-info .rep {
-      margin: 0 0 3px;
-      font-size: 10.5px;
-      color: var(--yellow);
-      font-weight: 700;
-    }
-
-    .contact-lines {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      font-size: 9.5px;
-      color: #c5d5f7;
-      line-height: 1.45;
-    }
-
-    .contact-lines a {
-      color: #fff;
-      text-decoration: none;
-    }
-
-    .footer-qr img {
-      width: 56px;
-      height: 56px;
-      border-radius: 6px;
-      background: #fff;
-      padding: 3px;
-      display: block;
-    }
-
-    .footer-qr span {
-      display: block;
-      margin-top: 3px;
-      font-size: 8px;
-      color: #fecaca;
-      font-weight: 700;
-      text-align: center;
-    }
-
-    .patent-stamp {
-      border: 2px solid var(--yellow);
-      padding: 6px 9px;
-      border-radius: 6px;
-      color: var(--yellow);
-      text-align: center;
-      transform: rotate(-1.5deg);
-      flex-shrink: 0;
-    }
-
-    .patent-stamp div:first-child {
-      font-size: 8.5px;
-      font-weight: 700;
-    }
-
-    .patent-stamp div:last-child {
-      font-size: 11px;
-      font-weight: 900;
-    }
-
-    @media print {
-      .no-print {
-        display: none !important;
-      }
-
-      body {
-        background: #fff;
-      }
-
-      .a4-page {
-        margin: 0;
-      }
-
-      .header,
-      .tag,
-      .poc-banner,
-      .footer,
-      .vs-box,
-      .patent-stamp,
-      .equip-line,
-      .f-icon {
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="enx-brochure.css" />
 </head>
-
 <body>
-  <p class="print-hint no-print">
-    <b>소방청·소방본부 협력 제안용</b> · A4 · 여백 없음 · 배경 그래픽 체크
-    <button type="button" onclick="window.print()">인쇄 / PDF 저장</button>
+  <p class="screen-bar no-print">
+    <b>01 · 선행 안전망</b> — 소방청·지자체 재난안전<br />
+    A4 · 여백 없음 · 배경 그래픽 ON
+    <button type="button" onclick="window.print()">PDF 저장 / 인쇄</button>
   </p>
 
-  <article class="a4-page">
-    <header class="header">
-      <span class="tag">소방청·지자체 재난안전 · 시민 안전망 협력 제안 (1장)</span>
-      <h1 class="title">
-        공식 119 도달 <span>전·후</span> 이웃 선행 대응<br />
-        지금여기(SpotVibe) 하이퍼로컬 SOS·소화기 레이어
-      </h1>
-      <p class="subtitle">
-        <b>119·112 선연락 안내</b>를 전제로, 반경 3km 앱 사용자에게 실시간 SOS·
-        시민 제보 소화기 위치를 제공하는 <b>보조 안전 인프라</b> (공식 대응 대체 아님)
-      </p>
+  <article class="sheet theme-fire">
+    <header class="hero">
+      <div class="hero-grid" aria-hidden="true"></div>
+      <div class="hero-inner">
+        <div class="hero-meta">
+          <div class="brand">
+            <img src="assets/enx-app-icon.png" alt="" width="30" height="30" />
+            <div class="brand-text">지금여기 SpotVibe<small>(주)이앤엑스 ENX</small></div>
+          </div>
+          <span class="audience-badge">소방·재난안전 협력</span>
+        </div>
+        <p class="concept-label">CONCEPT · 선행 안전망</p>
+        <h1>119에 닿기 <em>전</em>,<br />3km 이웃이 먼저 안다</h1>
+        <p class="hero-lead">
+          출동 전·후 <strong>시민 현장 정보</strong>(SOS·소화기·사진)를 검증된 웹으로 모읍니다.
+          <strong>공식 대응을 보완</strong>하는 하이퍼로컬 안전 레이어입니다.
+        </p>
+        <p class="hero-note">※ 119·112·소방 공식 출동·지휘를 <b>대체하지 않습니다</b>. 보조·선행 안전 채널입니다.</p>
+        <div class="stat-row">
+          <div class="stat"><b>3km</b><span>이웃 실시간 수신</span></div>
+          <div class="stat"><b>15분</b><span>SOS 자동 만료</span></div>
+          <div class="stat"><b>4유형</b><span>화재·치안·조난·구급</span></div>
+        </div>
+      </div>
     </header>
 
-    <main class="content">
-      <section class="vs-container">
-        <div class="vs-box old">
-          <h2 class="vs-title">기존 단독 대응 구조</h2>
-          <ul class="vs-list">
-            <li>신고 접수 후 출동까지 <b>현장 정보 공백</b></li>
-            <li>산·공원 소화기 위치 <b>지도 미등록</b> 다수</li>
-            <li>SOS·시설 제보 앱 <b>유령화</b>(DAU·검증 부재)</li>
-          </ul>
+    <main class="body">
+      <section class="split">
+        <div class="col-text">
+          <div class="shift-card was">
+            <h2>AS-IS · 구조적 공백</h2>
+            <ul>
+              <li>접수~출동 <b>현장 정보 블라인드</b></li>
+              <li>산·공원 <b>소화기 미등록</b></li>
+              <li>민간 SOS <b>검증·지속 이용 부재</b></li>
+            </ul>
+          </div>
+          <div class="shift-card now">
+            <h2>TO-BE · 지금여기</h2>
+            <ul>
+              <li><b>119·112 확인 후</b> 4유형 SOS</li>
+              <li>시민 <b>GPS+사진</b> 소화기 레이어</li>
+              <li>AI·EXIF·<b>집단 신고</b> 검증</li>
+            </ul>
+          </div>
+          <div class="flow">
+            <div class="flow-step"><span class="num">01</span><span class="txt">119·112<br />확인</span></div>
+            <span class="flow-arrow">›</span>
+            <div class="flow-step"><span class="num">02</span><span class="txt">4유형<br />SOS</span></div>
+            <span class="flow-arrow">›</span>
+            <div class="flow-step"><span class="num">03</span><span class="txt">3km<br />실시간</span></div>
+          </div>
         </div>
-        <div class="vs-box new">
-          <h2 class="vs-title">💡 지금여기(SpotVibe)</h2>
-          <ul class="vs-list">
-            <li>SOS 4유형·<b>119/112 확인 후</b> 발신 UX</li>
-            <li>반경 3km <b>실시간 마커</b>·15분 만료 감쇠</li>
-            <li>GPS+사진 <b>소화기 제보</b>·AI·EXIF 검증</li>
-          </ul>
+        <div class="col-visual">
+          <div class="device">
+            <span class="device-notch"></span>
+            <img src="assets/brochure-spotvibe-sos-fire.png" alt="SOS·소화기 지도 화면" />
+          </div>
+          <div class="caption-list">
+            <p class="cap"><strong>SOS·소화기 분리</strong> — 상단 FAB에서 화재 SOS와 소화기 조회 독립</p>
+            <p class="cap"><strong>15분 만료·감쇠</strong> — 지도 혼잡·오남용 완화</p>
+            <p class="cap"><strong>QR 웹 접속</strong> — 설치 없이 현장 시연·체험</p>
+          </div>
         </div>
       </section>
 
-      <figure class="product-visual">
-        <div class="visual-placeholder">
-          assets/brochure-dashboard-spotvibe-sos.png<br />
-          (SOS·소화기 지도 화면 캡처)
-        </div>
-        <figcaption class="visual-label">▲ 화재 SOS + 소화기 긴급 조회 + 이웃 실시간 수신 (앱 실제 화면)</figcaption>
-      </figure>
-
-      <section class="poc-banner">
-        <div class="poc-icon" aria-hidden="true">🧯</div>
-        <div class="poc-text">
-          <h3>현장 실증 — 미등록 소화기·숲길 안전 시설 제보</h3>
-          <p>
-            안양·인천 현장 탐색에서 네이버 지도에 없는 소화기 보관함·안전 시설을 GPS+사진으로 제보·마커화했습니다.
-            초기 화재 시 <b>가장 가까운 소화기 경로</b>를 시민이 먼저 확인할 수 있습니다.
-          </p>
+      <section class="proof">
+        <span class="ico">🧯</span>
+        <div class="proof-body">
+          <h3>현장 실증 — 지도에 없던 소화기·안전 시설</h3>
+          <p>2026-05 안양·인천 탐색: 소화기 보관함 등 GPS+사진 제보·마커화. 초기 화재 시 가장 가까운 소화기를 시민이 먼저 확인.</p>
         </div>
       </section>
 
-      <div class="grid-4">
-        <div class="feature-card">
-          <div class="f-icon">🆘</div>
-          <div class="f-text">
-            <h4>SOS 4유형</h4>
-            <p>화재·치안·조난·구급 — 메모 AI 검열·사진 EXIF·비전 2단 검증</p>
-          </div>
-        </div>
-        <div class="feature-card">
-          <div class="f-icon">📞</div>
-          <div class="f-text">
-            <h4>공식 연락 우선 UX</h4>
-            <p>119/112 안내·확인 후 유형 선택 — 오남용·허위 신고 완화 설계</p>
-          </div>
-        </div>
-        <div class="feature-card">
-          <div class="f-icon">🧯</div>
-          <div class="f-text">
-            <h4>소화기 3km 조회</h4>
-            <p>시민 제보 레이어·허위신고 누적 시 자동 비공개 처리</p>
-          </div>
-        </div>
-        <div class="feature-card">
-          <div class="f-icon">📡</div>
-          <div class="f-text">
-            <h4>관제·실증 확장</h4>
-            <p>지자체·소방 연계 SaaS 대시보드·KPI(응답률·제보 정확도) PoC 협의</p>
-          </div>
-        </div>
-      </div>
+      <section class="cap-grid">
+        <div class="cap-item"><div class="ico">🆘</div><h4>SOS</h4><p>4유형·15분 만료</p></div>
+        <div class="cap-item"><div class="ico">📞</div><h4>119 우선</h4><p>전화·확인 UX</p></div>
+        <div class="cap-item"><div class="ico">🧯</div><h4>소화기</h4><p>GPS 제보·조회</p></div>
+        <div class="cap-item"><div class="ico">🏛️</div><h4>PoC</h4><p>지자체·관제 협의</p></div>
+      </section>
 
-      <p class="equip-line">
-        ※ <em>소방 공식 시스템 대체가 아닌 보조 채널</em> · 데이터는 RLS·모더레이션·
-        <em>관리자 재판</em> 포함 · SSG랜더스 등 민간실증 진행 중
-      </p>
+      <p class="legal">※ 보조 안전 채널 · RLS·모더레이션 · SSG랜더스 TRYOUT 실증</p>
     </main>
 
-    <footer class="footer">
-      <div class="footer-brand">
-        <div class="footer-logo-img">SV</div>
-        <div class="company-info">
-          <h2>(주)이앤엑스 ENX · 지금여기</h2>
-          <p class="rep">대표이사 박원평</p>
-          <ul class="contact-lines">
-            <li>사업자 302-47-00920 · <a href="tel:01046392673">010-4639-2673</a></li>
-            <li><a href="mailto:tseizou@naver.com">tseizou@naver.com</a></li>
-          </ul>
-        </div>
+    <footer class="foot">
+      <div class="foot-info">
+        <h2>(주)이앤엑스 ENX · 지금여기</h2>
+        <p class="sub">대표이사 박원평</p>
+        <p>302-47-00920 · <a href="tel:01046392673">010-4639-2673</a> · <a href="mailto:tseizou@naver.com">tseizou@naver.com</a></p>
       </div>
-      <div class="footer-qr">
+      <div class="foot-qr">
         <img src="assets/brochure-qr-spotvibe.png" alt="지금여기 시연 QR" />
-        <span>앱 시연 QR</span>
+        <span>시연 QR</span>
       </div>
-      <div class="patent-stamp">
-        <div>하이퍼로컬 SOS·UGC 검증</div>
-        <div>출원 10-2026-0086971호</div>
+      <div class="foot-stamp">
+        <small>특허 출원</small>
+        <strong>10-2026-0086971</strong>
       </div>
     </footer>
   </article>
 </body>
-
 </html>
