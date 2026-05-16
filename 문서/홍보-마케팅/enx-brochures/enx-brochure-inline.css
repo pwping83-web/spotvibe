@@ -244,8 +244,9 @@ body {
 .features {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 6mm;
-  margin-bottom: 8mm;
+  gap: 5mm;
+  margin-bottom: 6mm;
+  flex-shrink: 0;
 }
 
 .feature-card {
@@ -270,68 +271,97 @@ body {
   word-break: keep-all;
 }
 
+/* 시연 화면 — 세로 폰 프레임 (좌, 고정 폭) + 노트 (우) */
 .visual {
-  display: flex;
-  gap: 6mm;
-  margin-bottom: auto;
-  align-items: center;
-  background: var(--bg-card);
-  padding: 16px;
-  border-radius: 12px;
-  border: 1px solid var(--border-card);
+  display: grid;
+  grid-template-columns: 42mm 1fr;
+  gap: 5mm;
+  align-items: stretch;
+  margin-bottom: 4mm;
+  flex: 1 1 auto;
+  min-height: 62mm;
 }
 
 .device {
-  width: 140px;
-  height: 100px;
-  background: #1e1e24;
-  border-radius: 8px;
+  position: relative;
+  width: 42mm;
+  height: 100%;
+  min-height: 58mm;
+  border-radius: 14px;
+  padding: 6px;
+  background: linear-gradient(165deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid var(--border-card);
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  flex-shrink: 0;
+  align-self: stretch;
+}
+
+.device::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28%;
+  height: 3px;
+  border-radius: 3px;
+  background: #334155;
+  z-index: 2;
+  pointer-events: none;
 }
 
 .device img {
+  display: block;
   width: 100%;
-  height: 100%;
+  height: 58mm;
+  min-height: 58mm;
+  flex: 1 1 auto;
   object-fit: cover;
   object-position: top center;
-  opacity: 0.9;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .visual-notes {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  justify-content: center;
+  gap: 8px;
+  min-height: 0;
 }
 
 .note {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-left: 3px solid var(--accent);
 }
 
 .note strong {
-  font-size: 13px;
-  color: var(--accent);
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 4px;
   font-family: "Inter", sans-serif;
 }
 
 .note span {
-  font-size: 12.5px;
+  font-size: 10.5px;
   color: var(--text-muted);
-  line-height: 1.5;
+  line-height: 1.45;
+  word-break: keep-all;
 }
 
 .impact-box {
   background: linear-gradient(90deg, var(--impact-grad), transparent);
   border-left: 4px solid var(--accent);
-  padding: 16px 20px;
-  margin-bottom: 10mm;
+  padding: 12px 16px;
+  margin-bottom: 6mm;
   border-radius: 0 8px 8px 0;
+  flex-shrink: 0;
 }
 
 .impact-box h4 {
@@ -352,14 +382,26 @@ body {
   border-top: 1px solid var(--border-card);
   padding-top: 6mm;
   display: flex;
-  justify-content: space-between;
   align-items: flex-end;
+  gap: 12px;
+  flex-shrink: 0;
+  margin-top: auto;
 }
 
 .footer-main {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+.footer-end {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 .footer-main .company {
@@ -382,20 +424,26 @@ body {
 .footer-qr {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 6px;
+  align-items: flex-end;
+  gap: 4px;
+  text-align: right;
+  flex-shrink: 0;
 }
 
 .footer-qr img {
+  display: block;
+  width: 44px;
+  height: 44px;
   background: #fff;
   padding: 2px;
   border-radius: 6px;
 }
 
 .footer-qr span {
-  font-size: 10px;
+  font-size: 9px;
   color: var(--text-muted);
-  font-weight: 600;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .footer-stamp {
@@ -439,5 +487,15 @@ body {
     width: 100%;
     height: 100vh;
     page-break-after: always;
+  }
+  .a4-canvas,
+  .feature-card,
+  .stat,
+  .device,
+  .impact-box,
+  .footer-stamp,
+  .concept-badge {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }

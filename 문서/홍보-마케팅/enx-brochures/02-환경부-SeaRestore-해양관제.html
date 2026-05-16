@@ -1,119 +1,101 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>환경·해양 — SeaRestore | ENX</title>
+  <title>ENX 제안서 - 환경부·공공 쓰레기통</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="enx-brochure.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="enx-brochure-inline.css?v=4" />
 </head>
-<body>
+<body class="theme-env">
+
   <p class="screen-bar no-print">
-    <b>02 · 실적이 증명되는 바다</b> — 환경부·해양수산부<br />
-    A4 · 여백 없음 · 배경 그래픽 ON
+    <span><b>02 · 깨끗한 거리 — 환경부·지자체</b><br />A4 · 여백 없음 · 배경 그래픽 ON 권장</span>
     <button type="button" onclick="window.print()">PDF 저장 / 인쇄</button>
   </p>
 
-  <article class="sheet theme-env">
-    <header class="hero">
-      <div class="hero-grid" aria-hidden="true"></div>
-      <div class="hero-inner">
-        <div class="hero-meta">
-          <div class="brand">
-            <img src="assets/enx-app-icon.png" alt="" width="30" height="30" />
-            <div class="brand-text">ENX SeaRestore<small>해양 종자 살포 스마트 관제</small></div>
-          </div>
-          <span class="audience-badge">환경·해양</span>
-        </div>
-        <p class="concept-label">CONCEPT · 실적이 증명되는 바다</p>
-        <h1>손으로 쓰지 않는 살포,<br /><em>GPS·IoT</em>가 증명한다</h1>
-        <p class="hero-lead">
-          수기 일지·엑셀 대신 <strong>전자 실적</strong>을 만듭니다.
-          환경 영향 평가·사업 결과 보고에 바로 쓰는 <strong>월 구독(SaaS) 관제</strong>입니다.
-        </p>
-        <div class="stat-row">
-          <div class="stat"><b>ha</b><span>면적 자동 산출</span></div>
-          <div class="stat"><b>SaaS</b><span>초기 구축 최소</span></div>
-          <div class="stat"><b>IoT</b><span>직접 연동 PoC</span></div>
-        </div>
-      </div>
-    </header>
+  <article class="a4-canvas">
+    <div class="content-wrapper">
 
-    <main class="body">
-      <section class="split">
-        <div class="col-text">
-          <div class="shift-card was">
-            <h2>AS-IS · 수기·분리</h2>
-            <ul>
-              <li>살포 면적·항적 <b>엑셀·일지</b></li>
-              <li>파종 장치 ↔ 관제 <b>연동 불가</b></li>
-              <li>사후 보고, <b>실시간 공백</b></li>
-            </ul>
-          </div>
-          <div class="shift-card now">
-            <h2>TO-BE · SeaRestore</h2>
-            <ul>
-              <li><b>사업 기간</b> 월 구독</li>
-              <li>투하 <b>좌표·ha 실시간</b></li>
-              <li>기상·항로 <b>AI 로그</b></li>
-            </ul>
-          </div>
-          <div class="flow">
-            <div class="flow-step"><span class="num">01</span><span class="txt">IoT<br />투하</span></div>
-            <span class="flow-arrow">›</span>
-            <div class="flow-step"><span class="num">02</span><span class="txt">클라우드<br />좌표</span></div>
-            <span class="flow-arrow">›</span>
-            <div class="flow-step"><span class="num">03</span><span class="txt">관제<br />대시보드</span></div>
-          </div>
+      <header class="header">
+        <div class="header-brand">
+          <img src="assets/enx-app-icon.png" alt="" width="36" height="36" onerror="this.style.display='none'" />
+          <div class="logo">ENX<small>지금여기 SpotVibe</small></div>
         </div>
-        <div class="col-visual">
-          <div class="device">
-            <span class="device-notch"></span>
-            <img src="assets/brochure-spotvibe-ai-route.png" alt="ENX 관제 UI" />
+        <span class="concept-badge">Concept 02</span>
+      </header>
+
+      <section class="hero">
+        <h1>지도에 없던 분리수거함,<br /><span>시민이 찍어 올리는 환경 레이어</span></h1>
+        <p class="lead">네이버·카카오맵에 없는 <strong>공공 쓰레기통·분리수거함</strong>을 시민이 GPS+사진으로 제보합니다. 반경 <strong>500m</strong>에서 즉시 찾고, <strong>앱 설치 없는 모바일 웹</strong>으로 지자체 청결망과 즉시 연동되는 환경 MVP가 지금 작동 중입니다.</p>
+      </section>
+
+      <section class="stats">
+        <div class="stat"><b>500m</b><span>반경 즉시 표시</span></div>
+        <div class="stat"><b>GPS</b><span>사진 제보</span></div>
+        <div class="stat"><b>QR</b><span>웹 즉시 접속</span></div>
+      </section>
+
+      <section class="features">
+        <div class="feature-card">
+          <h3>🗑️ 공공 쓰레기통 레이어</h3>
+          <p>지도 우측 아이콘·500m 원으로 공공 수거함 위치를 표시합니다. TrashBinSheet로 사진·GPS 등록이 가능합니다.</p>
+        </div>
+        <div class="feature-card">
+          <h3>📸 시민 제보·AI 검증</h3>
+          <p>텍스트·EXIF·비전으로 허위 제보를 줄이고, Supabase RLS로 권한을 분리합니다. 신뢰할 수 있는 분리배출 공공 데이터를 축적합니다.</p>
+        </div>
+        <div class="feature-card">
+          <h3>♻️ 분리배출 공백 메우기</h3>
+          <p>공원·골목·축제장 등 지도 미등록 구간을 시민 데이터로 채웁니다. 값비싼 하드웨어 없이 스마트폰·집단지성으로 촘촘한 청결망을 완성합니다.</p>
+        </div>
+      </section>
+
+      <section class="visual">
+        <div class="device">
+          <img src="assets/brochure-spotvibe-sos-fire.png" alt="시연 화면" onerror="this.style.display='none'" />
+        </div>
+        <div class="visual-notes">
+          <div class="note">
+            <strong>공공 쓰레기통 · TrashBinSheet</strong>
+            <span>우측 지도 아이콘·제보 패널에서 조회·등록합니다. 실시간 동기화와 RLS로 지자체 연계 데이터를 안전하게 관리합니다.</span>
           </div>
-          <div class="caption-list">
-            <p class="cap"><strong>ENX 관제 UI</strong> — 지도·AI·실시간 레이어(시연 캡처)</p>
-            <p class="cap"><strong>SeaRestore 전용</strong> — 살포·ha 화면은 PoC 시 별도 제공</p>
-            <p class="cap"><strong>망분리·전용망</strong> — 기관 환경에 맞춘 확장</p>
+          <div class="note">
+            <strong>Frictionless UX (QR 접속)</strong>
+            <span>무거운 네이티브 앱 다운로드 없이, QR 스캔 한 번으로 즉시 현장 시연·쓰레기통 제보 체험이 시작됩니다.</span>
           </div>
         </div>
       </section>
 
-      <section class="proof">
-        <span class="ico">📟</span>
-        <div>
-          <h3>IoT ↔ 웹 서버 다이렉트 연동(PoC) 완료</h3>
-          <p>펌웨어 단말 투하 신호 → 위도·경도·면적(ha) 즉시 반영. 이원 수집 원천기술(특허 출원 10-2026-0086686).</p>
+      <section class="impact-box">
+        <h4>기대 효과 및 협력 모델 (B2G)</h4>
+        <p>환경부 생활쓰레기·분리배출·지자체 청결 PoC와 연계합니다. 공공 지도의 쓰레기통 공백을 시민 참여 소프트웨어로 메우는 비용 효율적 환경 레이어를 완성합니다.</p>
+      </section>
+
+      <footer class="footer">
+        <div class="footer-main">
+          <p class="company">이앤엑스 ENX · 기획개발그룹</p>
+          <p class="meta">
+            대표 박원평 · 사업자등록번호 302-47-00920<br />
+            <a href="tel:01046392673">010-4639-2673</a> · <a href="mailto:tseizou@naver.com">tseizou@naver.com</a>
+          </p>
         </div>
-      </section>
+        <div class="footer-end">
+          <div class="footer-stamp">
+            <small>BM 특허 출원</small>
+            <strong>10-2026-0086971</strong>
+          </div>
+          <div class="footer-qr">
+            <img src="assets/brochure-qr-spotvibe.png" alt="시연 QR" width="44" height="44" onerror="this.style.display='none'" />
+            <span>LIVE 시연 QR</span>
+          </div>
+        </div>
+      </footer>
 
-      <section class="cap-grid">
-        <div class="cap-item"><div class="ico">☁️</div><h4>SaaS</h4><p>URL 즉시 관제</p></div>
-        <div class="cap-item"><div class="ico">📡</div><h4>IoT</h4><p>조작·누락 방지</p></div>
-        <div class="cap-item"><div class="ico">📊</div><h4>면적</h4><p>ha 자동 근사</p></div>
-        <div class="cap-item"><div class="ico">🌤️</div><h4>AI 항로</h4><p>기상·안전 보조</p></div>
-      </section>
-
-      <p class="legal">※ <em>블루카본</em>·연안 정화·해양 생태복원 과제 PoC 협의</p>
-    </main>
-
-    <footer class="foot">
-      <div class="foot-info">
-        <h2>(주)이앤엑스 ENX</h2>
-        <p class="sub">대표이사 박원평</p>
-        <p>302-47-00920 · <a href="tel:01046392673">010-4639-2673</a> · <a href="mailto:tseizou@naver.com">tseizou@naver.com</a></p>
-      </div>
-      <div class="foot-qr">
-        <img src="assets/brochure-qr-spotvibe.png" alt="시연 QR" />
-        <span>시연 QR</span>
-      </div>
-      <div class="foot-stamp">
-        <small>특허 출원</small>
-        <strong>10-2026-0086686</strong>
-      </div>
-    </footer>
+    </div>
   </article>
+
 </body>
 </html>
