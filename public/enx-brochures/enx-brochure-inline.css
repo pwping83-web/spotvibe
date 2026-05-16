@@ -5,8 +5,8 @@
   --border-card: rgba(255, 255, 255, 0.08);
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
-  --phone-w: 56mm;
-  --phone-h: 74mm;
+  --phone-w: 58mm;
+  --phone-h: 80mm;
   --accent: #a855f7;
   --accent-glow: rgba(168, 85, 247, 0.15);
   --accent-grad: linear-gradient(135deg, #c084fc, #a855f7);
@@ -400,9 +400,19 @@ body {
 }
 
 .footer-main {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+.footer-end {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 .footer-main .company {
@@ -425,11 +435,16 @@ body {
 .footer-qr {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 6px;
+  align-items: flex-end;
+  gap: 4px;
+  text-align: right;
+  flex-shrink: 0;
 }
 
 .footer-qr img {
+  display: block;
+  width: 44px;
+  height: 44px;
   background: #fff;
   padding: 2px;
   border-radius: 6px;
