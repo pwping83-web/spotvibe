@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
@@ -7,15 +7,18 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="enx-brochure-inline.css?v=12" />
+  <link rel="stylesheet" href="enx-brochure-inline.css" />
 </head>
 <body class="theme-fire">
+
   <p class="screen-bar no-print">
-    <span><b>01 · 소방·재난안전</b><br />A4 · 배경 ON</span>
-    <button type="button" onclick="window.print()">PDF / 인쇄</button>
+    <span><b>01 · 선행 안전망 — 소방청·지자체</b><br />A4 · 여백 없음 · 배경 그래픽 ON 권장</span>
+    <button type="button" onclick="window.print()">PDF 저장 / 인쇄</button>
   </p>
+
   <article class="a4-canvas">
     <div class="content-wrapper">
+
       <header class="header">
         <div class="header-brand">
           <img src="assets/enx-app-icon.png" alt="" width="36" height="36" onerror="this.style.display='none'" />
@@ -23,61 +26,75 @@
         </div>
         <span class="concept-badge">Concept 01</span>
       </header>
+
       <section class="hero">
-        <h1>119 전 이웃 안전망,<br /><span>시민 SOS·소화기</span></h1>
-        <p class="lead">119 도착 <strong>전</strong> 반경 <strong>3km</strong> 이웃 전파 · <strong>웹</strong>(설치 없음) · <strong>MVP 가동</strong></p>
-        <p class="disclaimer">※ 119·112·소방 <b>대체 아님</b> · 보조·선행 채널</p></section>
+        <h1>골든타임을 지키는 선행 안전망,<br /><span>시민 참여형 소방·재난 레이어</span></h1>
+        <p class="lead">119 도착 <strong>전</strong>, 반경 3km 이웃에게 현장 SOS·소화기·사진 정보를 <strong>앱 설치 없는 모바일 웹</strong>으로 실시간 연결합니다. SpotVibe 다크 UI 기반 <strong>하이퍼로컬 안전망</strong> MVP가 지금 작동 중입니다.</p>
+        <p class="disclaimer">※ 119·112·소방 공식 출동을 대체하지 않는 <b>보조·선행 안전 채널</b>입니다.</p>
+      </section>
+
       <section class="stats">
-        <div class="stat"><b>3km</b><span>이웃 실시간</span></div>
-        <div class="stat"><b>15분</b><span>SOS 만료</span></div>
-        <div class="stat"><b>4유형</b><span>화재·치안·조난·구급</span></div></section>
+        <div class="stat"><b>3km</b><span>이웃 실시간 전파</span></div>
+        <div class="stat"><b>15분</b><span>SOS 자동 만료</span></div>
+        <div class="stat"><b>4유형</b><span>화재·치안·조난·구급</span></div>
+      </section>
+
       <section class="features">
         <div class="feature-card">
-          <h3>🚨 이웃 SOS</h3>
-          <p>화재·치안·조난·구급 4유형 발신. 3km 실시간 전파, 15분 자동 종료.</p>
+          <h3>🚨 119 전 이웃 SOS</h3>
+          <p>공식 신고 확인 후 화재·치안·조난·구급 4유형으로 발신합니다. 반경 3km 앱 내 실시간 전파와 15분 자동 만료로 허위·장기 점유를 줄입니다.</p>
         </div>
         <div class="feature-card">
-          <h3>🧯 소화기 레이어</h3>
-          <p>GPS+사진 제보로 미등록 소화기 지도 표시. SOS FAB와 버튼 분리.</p>
+          <h3>🧯 소화기 시민 레이어</h3>
+          <p>GPS+사진 제보로 지도에 없던 소화기를 네온 마커로 표시합니다. SOS FAB와 분리된 독립 버튼으로 골든타임 직전 현장 대응을 돕습니다.</p>
         </div>
         <div class="feature-card">
-          <h3>🛡️ AI 검증</h3>
-          <p>텍스트·EXIF·비전으로 허위 차단. Supabase RLS로 권한 분리.</p>
-        </div></section>
+          <h3>🛡️ AI 3중 검증</h3>
+          <p>텍스트·EXIF·비전으로 허위 신고를 줄이고, Supabase RLS로 권한을 분리합니다. 공식 대응 우선 UX를 유지하는 신뢰 가능한 공공 데이터를 축적합니다.</p>
+        </div>
+      </section>
+
       <section class="visual">
         <div class="device">
-          <img src="assets/brochure-spotvibe-sos-fire.png" alt="지도 시연" onerror="this.style.display='none'" />
+          <img src="assets/brochure-spotvibe-sos-fire.png" alt="SOS·소화기 지도" onerror="this.style.display='none'" />
         </div>
         <div class="visual-notes">
           <div class="note">
-            <strong>SOS · 소화기 분리</strong>
-            <span>상단 FAB 독립 운영. 안양·인천 현장 실증 완료.</span>
+            <strong>SOS · 소화기 분리 UX</strong>
+            <span>상단 FAB에서 화재 SOS와 소화기 조회를 독립 운영합니다. 안양·인천 등 현장 실증으로 접속·제보 KPI를 검증했습니다.</span>
           </div>
           <div class="note">
-            <strong>QR 즉시 접속</strong>
-            <span>앱 설치 없이 스캔 → 현장 시연·SOS 체험.</span>
-          </div></div>
+            <strong>Frictionless UX (QR 접속)</strong>
+            <span>무거운 네이티브 앱 다운로드 없이, QR 스캔 한 번으로 즉시 현장 시연·SOS 체험이 시작됩니다.</span>
+          </div>
+        </div>
       </section>
+
       <section class="impact-box">
-        <h4>기대 효과 · B2G</h4>
-        <p>지자체·스마트시티·재난안전 PoC. SSG랜더스 TRYOUT 민간실증 KPI 측정.</p></section>
+        <h4>기대 효과 및 협력 모델 (B2G)</h4>
+        <p>지자체·스마트시티·재난안전 PoC 및 SSG랜더스 TRYOUT 민간실증과 연계합니다. 119 도착 전 이웃·시민 레이어로 골든타임을 보완하는 비용 효율적 소프트웨어 안전망을 완성합니다.</p>
+      </section>
 
       <footer class="footer">
         <div class="footer-main">
-          <p class="company">이앤엑스 ENX · 기획개발</p>
-          <p class="meta">대표 박원평 · 302-47-00920<br />
-            <a href="tel:01046392673">010-4639-2673</a> ·
-            <a href="mailto:tseizou@naver.com">tseizou@naver.com</a></p>
+          <p class="company">이앤엑스 ENX · 기획개발그룹</p>
+          <p class="meta">
+            대표 박원평 · 사업자등록번호 302-47-00920<br />
+            <a href="tel:01046392673">010-4639-2673</a> · <a href="mailto:tseizou@naver.com">tseizou@naver.com</a>
+          </p>
         </div>
-        <div class="footer-end">
-          <div class="footer-stamp"><small>특허 출원</small><strong>10-2026-0086971</strong></div>
-          <div class="footer-qr">
-            <img src="assets/brochure-qr-spotvibe.png" alt="QR" width="44" height="44" onerror="this.style.display='none'" />
-            <span>LIVE QR</span>
-          </div>
+        <div class="footer-qr">
+          <img src="assets/brochure-qr-spotvibe.png" alt="시연 QR" width="44" height="44" onerror="this.style.display='none'" />
+          <span>LIVE 시연 QR</span>
+        </div>
+        <div class="footer-stamp">
+          <small>BM 특허 출원</small>
+          <strong>10-2026-0086971</strong>
         </div>
       </footer>
+
     </div>
   </article>
+
 </body>
 </html>
