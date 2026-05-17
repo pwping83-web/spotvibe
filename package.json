@@ -13,6 +13,7 @@
     "review:pdf": "node scripts/kakao-review-bundle-pdf.mjs",
     "review:merge-images": "node scripts/review-images-to-pdf.mjs",
     "review:merge-full": "node scripts/review-merge-full-pdf.mjs",
+    "docs:pdf": "node scripts/md-to-pdf-ko.mjs",
     "grant:watch": "node scripts/grant-watch/run.mjs",
     "grant:hub": "node scripts/grant-watch/run.mjs",
     "grant:watch:cache": "node scripts/grant-watch/run.mjs --from-cache",
