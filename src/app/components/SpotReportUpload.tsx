@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Camera,
@@ -880,31 +880,9 @@ export function SpotReportUpload({
     scrollInputIntoSheet(e.target, sheetScrollRef.current);
   };
 
-  return (
-    <>
-      {/* FAB — mapToolbar: 지역 검색 블록 위 / floating: 구형 우측 단독 */}
-      <motion.button
-        type="button"
-        onClick={handleFabClick}
-        whileTap={{ scale: 0.92 }}
-        className={
-          fabVariant === 'mapToolbar'
-            ? 'pointer-events-auto absolute right-4 top-[4.65rem] z-[419] flex h-11 w-11 items-center justify-center rounded-2xl shadow-lg'
-            : 'pointer-events-auto absolute right-4 top-[13rem] z-[420] flex h-11 w-11 items-center justify-center rounded-2xl shadow-lg'
-        }
-        style={{
-          background: 'rgba(0,240,255,0.12)',
-          border: '1px solid rgba(0,240,255,0.5)',
-          boxShadow: '0 0 18px rgba(0,240,255,0.35)',
-        }}
-        aria-label="현장 제보 올리기"
-      >
-        <Camera size={20} color="#00F0FF" strokeWidth={2.2} />
-      </motion.button>
-
-      {/* 바텀 시트 */}
-      <AnimatePresence>
-        {showSheet && (
+  const sheetPortalContent = (
+    <AnimatePresence>
+      {showSheet && (
           <>
             {/* 딤 배경 */}
             <motion.div
@@ -1217,14 +1195,16 @@ export function SpotReportUpload({
                 >
                   <p className="mb-2.5 text-[10px] leading-snug text-white/42">
                     법적 책임은 <span className="font-semibold text-white/55">본인</span>에게 있습니다. 위
-                    모자이크 미리보기를 꼼꼼히 보시고, 타인 초상·권리를 침해하지 않는지 확인한 뒤 올려 주세요. 자세한
+                    모자이크 미리보기를 꼼꼼히 보시고, 타인 초상·권리를 침해하지 않는지 확인한 뒤 올려 주세요.                     자세한
                     내용은{' '}
-                    <Link
-                      to="/terms#spot-report-terms"
+                    <a
+                      href="/terms#spot-report-terms"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="font-semibold text-[#00F0FF]/85 underline decoration-[#00F0FF]/35 underline-offset-2"
                     >
                       이용약관 제5조
-                    </Link>
+                    </a>
                     를 참고해 주세요.
                   </p>
                   <label className="mb-3 flex cursor-pointer items-start gap-2.5 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5">
@@ -1277,6 +1257,34 @@ export function SpotReportUpload({
           </>
         )}
       </AnimatePresence>
+  );
+
+  return (
+    <>
+      {/* FAB — mapToolbar: 지역 검색 블록 위 / floating: 구형 우측 단독 */}
+      <motion.button
+        type="button"
+        onClick={handleFabClick}
+        whileTap={{ scale: 0.92 }}
+        className={
+          fabVariant === 'mapToolbar'
+            ? 'pointer-events-auto absolute right-4 top-[4.65rem] z-[419] flex h-11 w-11 items-center justify-center rounded-2xl shadow-lg'
+            : 'pointer-events-auto absolute right-4 top-[13rem] z-[420] flex h-11 w-11 items-center justify-center rounded-2xl shadow-lg'
+        }
+        style={{
+          background: 'rgba(0,240,255,0.12)',
+          border: '1px solid rgba(0,240,255,0.5)',
+          boxShadow: '0 0 18px rgba(0,240,255,0.35)',
+        }}
+        aria-label="현장 제보 올리기"
+      >
+        <Camera size={20} color="#00F0FF" strokeWidth={2.2} />
+      </motion.button>
+
+      {/* 딤·시트를 document.body에 portal로 렌더링
+          → 루트 스태킹 컨텍스트에서 z-[430]/z-[440]이 되어
+            MapArea 래퍼(z-0 SC) 안에 갇히지 않고 NavigationBar(z-30)보다 위에 표시됨 */}
+      {createPortal(sheetPortalContent, document.body)}
     </>
   );
 }
