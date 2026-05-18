@@ -22,6 +22,9 @@ import {
   isCoarsePointerDevice,
   setSpotReportSheetSessionOpen,
   spotReportSheetSessionOpen,
+  getSpotReportDraft,
+  setSpotReportDraft,
+  clearSpotReportSheetDraft,
 } from '@/lib/spotReportSheetSession';
 
 const SPOTVIBE_ADMIN_AI_LS = 'spotvibe_admin_ai_spot_verify';
@@ -327,7 +330,7 @@ export function SpotReportUpload({
   const [showSheet, setShowSheet] = useState(() => spotReportSheetSessionOpen);
 
   const setSheetOpen = (open: boolean) => {
-    setSpotReportSheetSessionOpen(open);
+    setSpotReportSheetSessionOpen(open); // false면 내부에서 draft도 clear
     setShowSheet(open);
   };
   const [cameraOpen, setCameraOpen] = useState(false);
@@ -337,11 +340,13 @@ export function SpotReportUpload({
     top: 0,
     height: typeof window !== 'undefined' ? window.innerHeight : 720,
   }));
-  const [preview, setPreview] = useState<string | null>(null);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [pickSource, setPickSource] = useState<PickSource | null>(null);
-  const [placeName, setPlaceName] = useState('');
-  const [description, setDescription] = useState('');
+  // 재마운트 시 draft 복원 (키보드→뷰포트 급변으로 언마운트된 경우 대비)
+  const _d = getSpotReportDraft();
+  const [preview, setPreview] = useState<string | null>(_d.previewUrl);
+  const [selectedFile, setSelectedFile] = useState<File | null>(_d.file);
+  const [pickSource, setPickSource] = useState<PickSource | null>(_d.pickSource);
+  const [placeName, setPlaceName] = useState(_d.placeName);
+  const [description, setDescription] = useState(_d.description);
   const [adminAiPhotoVerify, setAdminAiPhotoVerifyState] = useState(false);
   const [verifyUiKind, setVerifyUiKind] = useState<'none' | 'rpc' | 'ai'>('none');
   /** 제5조(현장 제보) 안내·초상권 등 — 미리보기 바뀔 때마다 다시 확인 */
@@ -370,6 +375,28 @@ export function SpotReportUpload({
     const v = videoRef.current;
     if (v) v.srcObject = null;
   }
+
+  // draft 동기화 헬퍼
+  const setPreviewWithDraft = (v: string | null) => {
+    setPreview(v);
+    setSpotReportDraft({ previewUrl: v });
+  };
+  const setSelectedFileWithDraft = (v: File | null) => {
+    setSelectedFile(v);
+    setSpotReportDraft({ file: v });
+  };
+  const setPlaceNameWithDraft = (v: string) => {
+    setPlaceName(v);
+    setSpotReportDraft({ placeName: v });
+  };
+  const setDescriptionWithDraft = (v: string) => {
+    setDescription(v);
+    setSpotReportDraft({ description: v });
+  };
+  const setPickSourceWithDraft = (v: PickSource | null) => {
+    setPickSource(v);
+    setSpotReportDraft({ pickSource: v });
+  };
 
   function revokePreview() {
     if (preview?.startsWith('blob:')) URL.revokeObjectURL(preview);
@@ -550,9 +577,9 @@ export function SpotReportUpload({
     }
     revokePreview();
     closeSpotCamera();
-    setSelectedFile(file);
-    setPreview(URL.createObjectURL(file));
-    setPickSource('camera');
+    setSelectedFileWithDraft(file);
+    setPreviewWithDraft(URL.createObjectURL(file));
+    setPickSourceWithDraft('camera');
     setUploadState('picking');
   }
 
@@ -561,6 +588,7 @@ export function SpotReportUpload({
     stopCameraTracks();
     setCameraOpen(false);
     revokePreview();
+    clearSpotReportSheetDraft();
     setSheetOpen(false);
     setPreview(null);
     setSelectedFile(null);
@@ -592,9 +620,9 @@ export function SpotReportUpload({
       return;
     }
     revokePreview();
-    setSelectedFile(f);
-    setPreview(URL.createObjectURL(f));
-    setPickSource('file');
+    setSelectedFileWithDraft(f);
+    setPreviewWithDraft(URL.createObjectURL(f));
+    setPickSourceWithDraft('file');
     setUploadState('picking');
   }
 
@@ -808,12 +836,12 @@ export function SpotReportUpload({
       toast.success('접수됐어요. 내용이 검토 중입니다.', {
         description: `${textReason.trim() ? `${textReason.trim()} · ` : ''}승인 후 실시간 피드에 공개돼요.`,
       });
-      if (preview?.startsWith('blob:')) URL.revokeObjectURL(preview);
-      setSelectedFile(null);
-      setPreview(null);
-      setPickSource(null);
-      setPlaceName('');
-      setDescription('');
+      clearSpotReportSheetDraft();
+      setSelectedFileWithDraft(null);
+      setPreviewWithDraft(null);
+      setPickSourceWithDraft(null);
+      setPlaceNameWithDraft('');
+      setDescriptionWithDraft('');
       onReportSubmitted?.();
       return;
     }
@@ -1163,7 +1191,7 @@ export function SpotReportUpload({
                         type="text"
                         enterKeyHint="next"
                         value={placeName}
-                        onChange={(e) => setPlaceName(e.target.value)}
+                        onChange={(e) => setPlaceNameWithDraft(e.target.value)}
                         onFocus={handleSheetFieldFocus}
                         onPointerDown={stopSheetPointerBubble}
                         onTouchStart={stopSheetPointerBubble}
@@ -1185,7 +1213,7 @@ export function SpotReportUpload({
                         type="text"
                         enterKeyHint="done"
                         value={description}
-                        onChange={(e) => setDescription(e.target.value)}
+                        onChange={(e) => setDescriptionWithDraft(e.target.value)}
                         onFocus={handleSheetFieldFocus}
                         onPointerDown={stopSheetPointerBubble}
                         onTouchStart={stopSheetPointerBubble}
@@ -1299,13 +1327,13 @@ export function SpotReportUpload({
                     <button
                       type="button"
                       onClick={() => {
-                        if (preview?.startsWith('blob:')) URL.revokeObjectURL(preview);
+                        clearSpotReportSheetDraft();
                         setVerifyUiKind('none');
                         setSpotReportLegalAck(false);
                         setUploadState('idle');
-                        setPreview(null);
-                        setSelectedFile(null);
-                        setPickSource(null);
+                        setPreviewWithDraft(null);
+                        setSelectedFileWithDraft(null);
+                        setPickSourceWithDraft(null);
                       }}
                       className="shrink-0 rounded-full border border-white/15 px-5 py-2.5 text-[12px] font-semibold text-white/70"
                     >
@@ -1355,10 +1383,10 @@ export function SpotReportUpload({
                       type="button"
                       onClick={() => {
                         const wasFile = pickSource === 'file';
-                        if (preview?.startsWith('blob:')) URL.revokeObjectURL(preview);
-                        setSelectedFile(null);
-                        setPreview(null);
-                        setPickSource(null);
+                        clearSpotReportSheetDraft();
+                        setSelectedFileWithDraft(null);
+                        setPreviewWithDraft(null);
+                        setPickSourceWithDraft(null);
                         setUploadState('idle');
                         if (!wasFile) void openSpotCamera();
                       }}
