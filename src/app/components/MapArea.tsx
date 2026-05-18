@@ -28,6 +28,7 @@ import {
 import { SpotReportUpload } from './SpotReportUpload';
 import { ExploreRegionFlowPanel } from './ExploreRegionFlowPanel';
 import { NearbyLivePhotosModal } from './NearbyLivePhotosModal';
+import { PhotoGallerySheet } from './PhotoGallerySheet';
 import { DisabledHelperSheet } from './DisabledHelperSheet';
 import { FireExtinguisherSheet } from './FireExtinguisherSheet';
 import { ToiletSheet, TOILET_MAP_ICON } from './ToiletSheet';
@@ -1500,6 +1501,7 @@ export function MapArea({
   const [regionPresetPanelOpen, setRegionPresetPanelOpen] = useState(false);
   const [regionPickVersion, setRegionPickVersion] = useState(0);
   const [livePhotosOpen, setLivePhotosOpen] = useState(false);
+  const [galleryOpen, setGalleryOpen] = useState(false);
   /** 소화기 긴급 조회 시트 */
   const [fireExtOpen, setFireExtOpen] = useState(false);
   /** 취약계층 도움 안내 시트 */
@@ -3626,6 +3628,23 @@ export function MapArea({
                   <span className="block h-1 w-full rounded-full bg-white/20" />
                 </button>
               </div>
+              <p className="mb-3 text-[11px] font-bold uppercase tracking-widest text-white/30">커뮤니티</p>
+              <motion.button
+                type="button"
+                whileTap={{ scale: 0.97 }}
+                onClick={() => { setGalleryOpen(true); setQuickPanelOpen(false); }}
+                className="mx-4 mb-4 flex items-center gap-3 rounded-xl px-4 py-3 text-left"
+                style={{ background: 'rgba(192,132,252,0.07)', border: '1px solid rgba(192,132,252,0.22)' }}
+              >
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#C084FC]/10">
+                  <Images size={18} style={{ color: '#C084FC' }} />
+                </span>
+                <div className="flex-1">
+                  <p className="text-[13px] font-bold text-white">커뮤니티 사진 갤러리</p>
+                  <p className="mt-0.5 text-[11px] text-white/35">풍경·버스킹·음식 등 카테고리별 사진</p>
+                </div>
+                <ChevronRight size={16} className="shrink-0 text-white/25" />
+              </motion.button>
               <p className="mb-3 text-[11px] font-bold uppercase tracking-widest text-white/30">도움말</p>
               <motion.button
                 type="button"
@@ -3719,6 +3738,12 @@ export function MapArea({
         mapCenter={livePhotoMapCenter}
         radiusKm={NEARBY_LIVE_PHOTOS_RADIUS_KM}
         enabled={livePhotoFeedEnabled && isActive}
+        isAdmin={isAdmin}
+        onModeration={onReportSubmitted}
+      />
+      <PhotoGallerySheet
+        open={galleryOpen}
+        onClose={() => setGalleryOpen(false)}
         isAdmin={isAdmin}
         onModeration={onReportSubmitted}
       />

@@ -26,6 +26,7 @@ import {
   setSpotReportDraft,
   clearSpotReportSheetDraft,
 } from '@/lib/spotReportSheetSession';
+import { PHOTO_CATEGORIES } from '@/lib/photoCategories';
 
 const SPOTVIBE_ADMIN_AI_LS = 'spotvibe_admin_ai_spot_verify';
 
@@ -347,6 +348,7 @@ export function SpotReportUpload({
   const [pickSource, setPickSource] = useState<PickSource | null>(_d.pickSource);
   const [placeName, setPlaceName] = useState(_d.placeName);
   const [description, setDescription] = useState(_d.description);
+  const [userCategory, setUserCategory] = useState<string | null>(_d.userCategory);
   const [adminAiPhotoVerify, setAdminAiPhotoVerifyState] = useState(false);
   const [verifyUiKind, setVerifyUiKind] = useState<'none' | 'rpc' | 'ai'>('none');
   /** 제5조(현장 제보) 안내·초상권 등 — 미리보기 바뀔 때마다 다시 확인 */
@@ -392,6 +394,10 @@ export function SpotReportUpload({
   const setDescriptionWithDraft = (v: string) => {
     setDescription(v);
     setSpotReportDraft({ description: v });
+  };
+  const setUserCategoryWithDraft = (v: string | null) => {
+    setUserCategory(v);
+    setSpotReportDraft({ userCategory: v });
   };
   const setPickSourceWithDraft = (v: PickSource | null) => {
     setPickSource(v);
@@ -594,6 +600,7 @@ export function SpotReportUpload({
     setSelectedFile(null);
     setPlaceName('');
     setDescription('');
+    setUserCategory(null);
     setPickSource(null);
     setVerifyUiKind('none');
     setSpotReportLegalAck(false);
@@ -787,6 +794,7 @@ export function SpotReportUpload({
         status: insertStatus,
         place_name: titleTrim,
         description: description.trim() || null,
+        user_category: userCategory || null,
         ai_reason:
           SKIP_AUTOVERIFY_RPC
             ? '테스트: 자동 verified'
@@ -842,6 +850,7 @@ export function SpotReportUpload({
       setPickSourceWithDraft(null);
       setPlaceNameWithDraft('');
       setDescriptionWithDraft('');
+      setUserCategoryWithDraft(null);
       onReportSubmitted?.();
       return;
     }
@@ -1225,6 +1234,40 @@ export function SpotReportUpload({
                         inputMode="text"
                         className="w-full touch-manipulation rounded-xl border border-white/12 bg-white/[0.04] px-3 py-2.5 text-[14px] text-white placeholder-white/25 outline-none focus:border-[#00F0FF]/40"
                       />
+                    </div>
+                    {/* 카테고리 선택 */}
+                    <div className="shrink-0 scroll-mt-2">
+                      <label className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold text-white/55">
+                        <span className="text-[11px] leading-none">🏷️</span>
+                        카테고리 <span className="font-normal text-white/35">(선택)</span>
+                      </label>
+                      <div
+                        onPointerDown={stopSheetPointerBubble}
+                        onTouchStart={stopSheetPointerBubble}
+                        onTouchEnd={stopSheetPointerBubble}
+                        onClick={stopSheetPointerBubble}
+                        className="flex flex-wrap gap-1.5"
+                      >
+                        {PHOTO_CATEGORIES.map((cat) => {
+                          const active = userCategory === cat.key;
+                          return (
+                            <button
+                              key={cat.key}
+                              type="button"
+                              onClick={() => setUserCategoryWithDraft(active ? null : cat.key)}
+                              className="flex items-center gap-1 rounded-full px-2.5 py-1 text-[11.5px] font-semibold transition-colors"
+                              style={{
+                                background: active ? 'rgba(0,240,255,0.18)' : 'rgba(255,255,255,0.05)',
+                                border: active ? '1px solid rgba(0,240,255,0.55)' : '1px solid rgba(255,255,255,0.10)',
+                                color: active ? '#00F0FF' : 'rgba(255,255,255,0.55)',
+                              }}
+                            >
+                              <span className="text-[12px] leading-none">{cat.emoji}</span>
+                              {cat.label}
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
                     {contentBlocked ? (
                       <p className="shrink-0 text-[10px] leading-snug text-red-400/95">

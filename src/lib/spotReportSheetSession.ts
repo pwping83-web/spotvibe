@@ -21,6 +21,7 @@ export interface SpotReportDraft {
   description: string;
   pickSource: 'camera' | 'file' | null;
   legalAck: boolean;
+  userCategory: string | null;
 }
 
 let _draft: SpotReportDraft = {
@@ -30,6 +31,7 @@ let _draft: SpotReportDraft = {
   description: '',
   pickSource: null,
   legalAck: false,
+  userCategory: null,
 };
 
 export function getSpotReportDraft(): SpotReportDraft {
@@ -44,7 +46,7 @@ export function clearSpotReportSheetDraft(): void {
   if (_draft.previewUrl?.startsWith('blob:')) {
     try { URL.revokeObjectURL(_draft.previewUrl); } catch { /* ignore */ }
   }
-  _draft = { file: null, previewUrl: null, placeName: '', description: '', pickSource: null, legalAck: false };
+  _draft = { file: null, previewUrl: null, placeName: '', description: '', pickSource: null, legalAck: false, userCategory: null };
 }
 
 // ── 기기 감지 ──
