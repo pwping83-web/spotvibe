@@ -296,12 +296,17 @@ export function SpotReportUpload({
   const sheetScrollRef = useRef<HTMLDivElement>(null);
   const adminFileInputRef = useRef<HTMLInputElement>(null);
   const cameraStreamRef = useRef<MediaStream | null>(null);
+  /** 제목·설명 포커스 직후 배경 탭이 닫기로 이어지는 것 방지(키보드·viewport 리사이즈) */
+  const sheetFormFocusGuardRef = useRef(false);
+  const sheetFormFocusGuardTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [uploadState, setUploadState] = useState<UploadState>('idle');
   const [showSheet, setShowSheet] = useState(false);
   const [cameraOpen, setCameraOpen] = useState(false);
   const [cameraVideoReady, setCameraVideoReady] = useState(false);
-  /** 모바일 키보드 — visualViewport 기준 시트를 위로 올림 */
-  const [keyboardInset, setKeyboardInset] = useState(0);
+  /** 모바일 키보드 — visualViewport 높이에 맞춰 시트 max-height만 조정(시트 bottom 이동은 고스트 클릭 유발) */
+  const [viewportHeight, setViewportHeight] = useState(() =>
+    typeof window !== 'undefined' ? window.innerHeight : 720,
+  );
   const [preview, setPreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [pickSource, setPickSource] = useState<PickSource | null>(null);
@@ -350,27 +355,28 @@ export function SpotReportUpload({
 
   useEffect(() => {
     if (!showSheet) {
-      setKeyboardInset(0);
+      setViewportHeight(typeof window !== 'undefined' ? window.innerHeight : 720);
+      sheetFormFocusGuardRef.current = false;
+      if (sheetFormFocusGuardTimerRef.current) {
+        clearTimeout(sheetFormFocusGuardTimerRef.current);
+        sheetFormFocusGuardTimerRef.current = null;
+      }
       return;
     }
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     const vv = window.visualViewport;
-    const updateKeyboardInset = () => {
-      if (!vv) {
-        setKeyboardInset(0);
-        return;
-      }
-      setKeyboardInset(Math.max(0, window.innerHeight - vv.height - vv.offsetTop));
+    const syncViewportHeight = () => {
+      setViewportHeight(vv?.height ?? window.innerHeight);
     };
-    updateKeyboardInset();
-    vv?.addEventListener('resize', updateKeyboardInset);
-    vv?.addEventListener('scroll', updateKeyboardInset);
+    syncViewportHeight();
+    vv?.addEventListener('resize', syncViewportHeight);
+    vv?.addEventListener('scroll', syncViewportHeight);
     return () => {
       document.body.style.overflow = prevOverflow;
-      vv?.removeEventListener('resize', updateKeyboardInset);
-      vv?.removeEventListener('scroll', updateKeyboardInset);
-      setKeyboardInset(0);
+      vv?.removeEventListener('resize', syncViewportHeight);
+      vv?.removeEventListener('scroll', syncViewportHeight);
+      setViewportHeight(window.innerHeight);
     };
   }, [showSheet]);
 
@@ -876,9 +882,31 @@ export function SpotReportUpload({
     ? undefined
     : 'max(1.25rem, calc(5.75rem + env(safe-area-inset-bottom, 0px)))';
 
+  function armSheetFormFocusGuard() {
+    sheetFormFocusGuardRef.current = true;
+    if (sheetFormFocusGuardTimerRef.current) clearTimeout(sheetFormFocusGuardTimerRef.current);
+    sheetFormFocusGuardTimerRef.current = setTimeout(() => {
+      sheetFormFocusGuardRef.current = false;
+      sheetFormFocusGuardTimerRef.current = null;
+    }, 480);
+  }
+
   const handleSheetFieldFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    armSheetFormFocusGuard();
     scrollInputIntoSheet(e.target, sheetScrollRef.current);
   };
+
+  function handleSheetFieldBlur() {
+    armSheetFormFocusGuard();
+  }
+
+  function handleBackdropDismiss(e: React.PointerEvent<HTMLDivElement>) {
+    if (e.target !== e.currentTarget) return;
+    if (sheetFormFocusGuardRef.current) return;
+    handleCancel();
+  }
+
+  const sheetMaxHeightPx = Math.min(720, Math.round(viewportHeight * 0.92));
 
   const sheetPortalContent = (
     <AnimatePresence>
@@ -889,9 +917,9 @@ export function SpotReportUpload({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[430] bg-black/65 touch-none"
+              className="fixed inset-0 z-[430] bg-black/65"
               aria-hidden
-              onClick={handleCancel}
+              onPointerDown={handleBackdropDismiss}
             />
 
             <motion.div
@@ -899,9 +927,9 @@ export function SpotReportUpload({
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-              className="fixed left-0 right-0 z-[440] flex max-h-[min(92dvh,720px)] flex-col rounded-t-2xl border-t border-white/10 bg-[#13131C] shadow-[0_-12px_48px_rgba(0,0,0,0.5)]"
-              style={{ bottom: keyboardInset }}
-              onClick={(e) => e.stopPropagation()}
+              className="fixed bottom-0 left-0 right-0 z-[440] flex flex-col rounded-t-2xl border-t border-white/10 bg-[#13131C] shadow-[0_-12px_48px_rgba(0,0,0,0.5)]"
+              style={{ maxHeight: sheetMaxHeightPx }}
+              onPointerDown={(e) => e.stopPropagation()}
             >
               <div className="shrink-0 px-5 pb-2 pt-4">
                 <div className="mx-auto mb-2 h-1 w-10 rounded-full bg-white/20" />
@@ -1045,6 +1073,7 @@ export function SpotReportUpload({
                         value={placeName}
                         onChange={(e) => setPlaceName(e.target.value)}
                         onFocus={handleSheetFieldFocus}
+                        onBlur={handleSheetFieldBlur}
                         placeholder="예: 홍대 걷고싶은거리, 여의도 한강공원"
                         maxLength={50}
                         autoComplete="off"
@@ -1062,6 +1091,7 @@ export function SpotReportUpload({
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         onFocus={handleSheetFieldFocus}
+                        onBlur={handleSheetFieldBlur}
                         placeholder="예: 버스킹 공연 중, 플리마켓 열렸어요"
                         maxLength={80}
                         autoComplete="off"
