@@ -27,14 +27,23 @@ import {
 const SPOTVIBE_ADMIN_AI_LS = 'spotvibe_admin_ai_spot_verify';
 
 /**
- * ━━ 사진등록 · AI 검증 테스트 스위치 ━━
- * 1) 주석처리(끄기):  `SKIP_SPOT_AI_VERIFY = true`  ← 지금
- * 2) 주석해제(복구):  `SKIP_SPOT_AI_VERIFY = false`
+ * ━━ 업로드 제약 테스트 스위치 ━━
  *
- * 끄면: 제목 Edge(moderate-user-content), held/block, 관리자 비전(ai-verify-spot-report) 미호출
- * 유지: 얼굴 모자이크, GPS, Storage, autoverify_own_spot_report(RPC 자동 승인)
+ * [1단계] SKIP_SPOT_AI_VERIFY = true  ← 현재
+ *   - 제목 AI(moderate-user-content) 미호출
+ *   - 관리자 사진 AI(ai-verify-spot-report) 미호출
+ *
+ * [2단계] SKIP_AUTOVERIFY_RPC = true  ← 현재
+ *   - autoverify_own_spot_report RPC 미호출
+ *   - insert 시 status = 'verified' 로 직접 저장
+ *
+ * 복구: 각각 false 로 변경
  */
 const SKIP_SPOT_AI_VERIFY = true;
+// ↑ [1단계 끄기] false 로 바꾸면 AI 텍스트·비전 검증 복구
+
+const SKIP_AUTOVERIFY_RPC = true;
+// ↑ [2단계 끄기] false 로 바꾸면 autoverify_own_spot_report RPC 복구
 
 /* STEP1-AI-BEGIN — 블록 주석으로 끄려면 위를 true 로 두거나, 아래 if (!SKIP_SPOT_AI_VERIFY) 안만 주석 처리 */
 
@@ -316,12 +325,10 @@ export function SpotReportUpload({
   const isMobileTouch = useMemo(() => isCoarsePointerDevice(), []);
   const [uploadState, setUploadState] = useState<UploadState>('idle');
   const [showSheet, setShowSheet] = useState(() => spotReportSheetSessionOpen);
-  const [mobileInputUnlock, setMobileInputUnlock] = useState(false);
 
   const setSheetOpen = (open: boolean) => {
     setSpotReportSheetSessionOpen(open);
     setShowSheet(open);
-    if (!open) setMobileInputUnlock(false);
   };
   const [cameraOpen, setCameraOpen] = useState(false);
   const [cameraVideoReady, setCameraVideoReady] = useState(false);
@@ -735,6 +742,13 @@ export function SpotReportUpload({
     const photoUrl = urlData.publicUrl;
 
     // pending 저장 후 DB RPC로 verified 확정 — 포인트는 트리거가 처리(AI·Edge 미사용)
+    // SKIP_AUTOVERIFY_RPC = true 일 때는 insert 시 바로 verified 로 저장
+    const insertStatus = SKIP_AUTOVERIFY_RPC
+      ? 'verified'
+      : textDecision === 'held'
+        ? 'held'
+        : 'pending';
+
     const { data: report, error: insertError } = await sb
       .from('spot_reports')
       .insert({
@@ -742,10 +756,17 @@ export function SpotReportUpload({
         photo_url: photoUrl,
         lat,
         lng,
-        status: textDecision === 'held' ? 'held' : 'pending',
+        status: insertStatus,
         place_name: titleTrim,
         description: description.trim() || null,
-        ai_reason: textDecision === 'held' ? (textReason.trim() || 'AI 텍스트 검토 보류') : null,
+        ai_reason:
+          SKIP_AUTOVERIFY_RPC
+            ? '테스트: 자동 verified'
+            : textDecision === 'held'
+              ? (textReason.trim() || 'AI 텍스트 검토 보류')
+              : null,
+        ai_label: SKIP_AUTOVERIFY_RPC ? '현장 제보' : null,
+        ai_category: SKIP_AUTOVERIFY_RPC ? 'other' : null,
       })
       .select('id')
       .single();
@@ -769,6 +790,15 @@ export function SpotReportUpload({
       await sb.storage.from('spot-photos').remove([path]);
       setUploadState('error');
       toast.error('제보 ID를 받지 못했어요.');
+      return;
+    }
+
+    // SKIP_AUTOVERIFY_RPC: RPC 없이 바로 완료
+    if (SKIP_AUTOVERIFY_RPC) {
+      setVerifyUiKind('none');
+      setUploadState('done');
+      toast.success('제보 완료! +10 포인트 적립 ✅  현장 제보');
+      onReportSubmitted?.();
       return;
     }
 
@@ -927,18 +957,13 @@ export function SpotReportUpload({
     scrollInputIntoSheet(e.target, sheetScrollRef.current);
   };
 
+  /**
+   * 갤럭시 등 Android: React stopPropagation 만으로는 네이티브 DOM 이벤트가
+   * 지도 클릭 핸들러까지 전달될 수 있어, nativeEvent.stopImmediatePropagation 도 함께 호출.
+   */
   const stopSheetPointerBubble = (e: React.SyntheticEvent) => {
     e.stopPropagation();
-  };
-
-  /** 갤럭시 등: 첫 탭에 키보드·뷰포트 점프로 고스트 클릭 나는 경우 완화 */
-  const unlockMobileField = (e: React.TouchEvent<HTMLInputElement>) => {
-    stopSheetPointerBubble(e);
-    setMobileInputUnlock(true);
-    const el = e.currentTarget;
-    window.requestAnimationFrame(() => {
-      el.focus({ preventScroll: true });
-    });
+    try { (e.nativeEvent as Event).stopImmediatePropagation(); } catch { /* ignore */ }
   };
 
   const sheetLayoutStyle: CSSProperties = isMobileTouch
@@ -1142,8 +1167,8 @@ export function SpotReportUpload({
                         onFocus={handleSheetFieldFocus}
                         onPointerDown={stopSheetPointerBubble}
                         onTouchStart={stopSheetPointerBubble}
-                        onTouchEnd={isMobileTouch ? unlockMobileField : undefined}
-                        readOnly={isMobileTouch && !mobileInputUnlock}
+                        onTouchEnd={stopSheetPointerBubble}
+                        onClick={stopSheetPointerBubble}
                         placeholder="예: 홍대 걷고싶은거리, 여의도 한강공원"
                         maxLength={50}
                         autoComplete="off"
@@ -1164,8 +1189,8 @@ export function SpotReportUpload({
                         onFocus={handleSheetFieldFocus}
                         onPointerDown={stopSheetPointerBubble}
                         onTouchStart={stopSheetPointerBubble}
-                        onTouchEnd={isMobileTouch ? unlockMobileField : undefined}
-                        readOnly={isMobileTouch && !mobileInputUnlock}
+                        onTouchEnd={stopSheetPointerBubble}
+                        onClick={stopSheetPointerBubble}
                         placeholder="예: 버스킹 공연 중, 플리마켓 열렸어요"
                         maxLength={80}
                         autoComplete="off"
