@@ -187,7 +187,28 @@ Reject (approve=false) ONLY when clearly:
 
 Do NOT reject merely because it is indoor if it looks like a cafe, restaurant, store, office lobby, or venue where a public event could occur. When unsure between public venue vs private home → approve.
 
-Reply with ONLY JSON (no markdown): {"approve":boolean,"label":"Korean short title max 40 chars","category":"performance|market|crowd|other","reason":"one Korean sentence"}`;
+CATEGORY — pick the single BEST match from these 12 values:
+- scenery   : scenic view, cityscape, landscape, skyline, architecture
+- night     : night view, illuminated streets, nightlife scenery
+- busking   : street performance, busking, live music on street
+- food      : restaurant, street food, food stall, eating out
+- cafe      : cafe, coffee shop, dessert shop, bakery
+- shopping  : shopping mall, market, flea market, store street
+- festival  : festival, outdoor event, fair, carnival, parade
+- sports    : outdoor sports, fitness, exercise, sport event
+- nature    : park, river, forest, garden, hiking trail
+- club      : club, bar, party venue, nightlife indoors
+- exhibition: gallery, museum, art, exhibition, cultural venue
+- daily     : general street scene, people, crowd, commute, everyday
+
+CONFIDENCE — how confident you are in the category choice (0.0 to 1.0).
+- 0.9+ : very clear match
+- 0.7–0.89 : fairly confident
+- 0.5–0.69 : uncertain, multiple categories possible
+- below 0.5 : very ambiguous
+
+Reply with ONLY JSON (no markdown):
+{"approve":boolean,"label":"Korean short title max 40 chars","category":"one of the 12 values above","confidence":0.00,"reason":"one Korean sentence"}`;
 
   const hint = `사용자가 적은 장소 이름: "${placeTitle}". 설명: ${(row.description as string | null)?.trim() || '(없음)'}`;
 
@@ -230,10 +251,27 @@ Reply with ONLY JSON (no markdown): {"approve":boolean,"label":"Korean short tit
     return jsonRes({ ok: false, error: 'groq_parse' }, 502);
   }
 
+  const VALID_CATEGORIES = [
+    'scenery','night','busking','food','cafe',
+    'shopping','festival','sports','nature',
+    'club','exhibition','daily',
+  ] as const;
+  const REVIEW_THRESHOLD = 0.70; // 신뢰도 이 미만이면 관리자 검토 큐로
+
   const approve = parsed.approve === true;
   const label = String(parsed.label ?? '현장 제보').slice(0, 80);
-  let category = String(parsed.category ?? 'other').toLowerCase();
-  if (!['performance', 'market', 'crowd', 'other'].includes(category)) category = 'other';
+
+  let category = String(parsed.category ?? '').toLowerCase().trim();
+  if (!(VALID_CATEGORIES as readonly string[]).includes(category)) category = 'daily';
+
+  const rawConf = parsed.confidence;
+  const confidence: number =
+    typeof rawConf === 'number' && rawConf >= 0 && rawConf <= 1
+      ? Math.round(rawConf * 1000) / 1000
+      : 0.5; // 신뢰도 미반환 시 기본값 0.5 → 관리자 검토 큐 편입
+
+  const needsReview = approve && confidence < REVIEW_THRESHOLD;
+
   const reason = String(parsed.reason ?? (approve ? 'AI 판독 통과' : 'AI 판독 반려')).slice(0, 300);
 
   const { data: updated, error: updErr } = await sb
@@ -242,6 +280,8 @@ Reply with ONLY JSON (no markdown): {"approve":boolean,"label":"Korean short tit
       status: approve ? 'verified' : 'rejected',
       ai_label: label,
       ai_category: category,
+      ai_category_confidence: confidence,
+      needs_category_review: needsReview,
       ai_reason: reason,
     })
     .eq('id', reportId)
@@ -260,6 +300,8 @@ Reply with ONLY JSON (no markdown): {"approve":boolean,"label":"Korean short tit
     rejected: !approve,
     label,
     category,
+    confidence,
+    needsReview,
     reason,
   });
 });

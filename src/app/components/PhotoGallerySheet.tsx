@@ -77,7 +77,7 @@ function GalleryPhotoTile({
         />
       </button>
       {/* 카테고리 배지 */}
-      <CategoryLabel catKey={item.user_category} />
+      <CategoryLabel catKey={item.display_category} />
       {/* 그라데이션 + 텍스트 */}
       <div className="pointer-events-none absolute inset-0 z-[1] flex flex-col justify-end">
         <div className="flex-1 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
@@ -415,9 +415,9 @@ export function PhotoGallerySheet({
                     imgClassName="h-full w-full object-contain"
                   />
                   {/* 카테고리 배지 */}
-                  {lightboxLive.user_category && (
+                  {lightboxLive.display_category && (
                     <div className="absolute left-3 top-3">
-                      <CategoryLabel catKey={lightboxLive.user_category} />
+                      <CategoryLabel catKey={lightboxLive.display_category} />
                     </div>
                   )}
                 </div>

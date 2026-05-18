@@ -3,10 +3,11 @@
  */
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router';
-import { ArrowLeft, Loader2, RefreshCw, ShieldAlert, ShieldOff, Ban, CheckCircle, XCircle, EyeOff } from 'lucide-react';
+import { ArrowLeft, Loader2, RefreshCw, ShieldAlert, ShieldOff, Ban, CheckCircle, XCircle, EyeOff, Tag } from 'lucide-react';
 import { toast } from 'sonner';
 import { getSupabase } from '@/lib/supabaseClient';
 import { getSosTypeMeta } from '@/types/sos';
+import { PHOTO_CATEGORIES } from '@/lib/photoCategories';
 
 type AbuseReportRow = {
   id: string;
@@ -46,6 +47,18 @@ type HeldSpotRow = {
   created_at: string;
 };
 
+type CategoryReviewRow = {
+  id: string;
+  photo_url: string;
+  place_name: string | null;
+  description: string | null;
+  ai_category: string | null;
+  ai_category_confidence: number | null;
+  user_category: string | null;
+  admin_category: string | null;
+  created_at: string;
+};
+
 type ContentAbuseRow = {
   id: string;
   content_type: string;
@@ -72,7 +85,9 @@ type SyncLogRow = {
 export function AdminSosModerationPage() {
   const [area, setArea] = useState<'sos' | 'spot' | 'sync'>('sos');
   const [tab, setTab] = useState<'reports' | 'moderation'>('reports');
-  const [spotSub, setSpotSub] = useState<'held' | 'abuse'>('held');
+  const [spotSub, setSpotSub] = useState<'held' | 'abuse' | 'category'>('held');
+  const [categoryReviews, setCategoryReviews] = useState<CategoryReviewRow[]>([]);
+  const [catBusyId, setCatBusyId] = useState<string | null>(null);
 
   // ── 데이터 수집 패널 상태 ──
   const [syncLogs, setSyncLogs] = useState<SyncLogRow[]>([]);
@@ -89,7 +104,7 @@ export function AdminSosModerationPage() {
     if (!sb) return;
     setLoading(true);
     try {
-      const [repRes, modRes, heldRes, contentRes, syncLogRes] = await Promise.all([
+      const [repRes, modRes, heldRes, contentRes, syncLogRes, catRevRes] = await Promise.all([
         sb
           .from('sos_signal_abuse_reports')
           .select(
@@ -134,6 +149,13 @@ export function AdminSosModerationPage() {
           .select('id,source,started_at,finished_at,fetched_count,inserted_count,skipped_count,error_msg,status')
           .order('started_at', { ascending: false })
           .limit(30),
+        sb
+          .from('spot_reports')
+          .select('id,photo_url,place_name,description,ai_category,ai_category_confidence,user_category,admin_category,created_at')
+          .eq('status', 'verified')
+          .eq('needs_category_review', true)
+          .order('created_at', { ascending: false })
+          .limit(60),
       ]);
 
       if (repRes.error) {
@@ -162,6 +184,9 @@ export function AdminSosModerationPage() {
       }
       if (!syncLogRes?.error) {
         setSyncLogs((syncLogRes?.data ?? []) as SyncLogRow[]);
+      }
+      if (!catRevRes?.error) {
+        setCategoryReviews((catRevRes?.data ?? []) as CategoryReviewRow[]);
       }
     } finally {
       setLoading(false);
@@ -328,6 +353,15 @@ export function AdminSosModerationPage() {
             }`}
           >
             유형별 신고 ({contentAbuse.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setSpotSub('category')}
+            className={`rounded-xl px-3 py-2 text-[13px] font-semibold ${
+              spotSub === 'category' ? 'bg-amber-500/15 text-amber-200' : 'text-white/45'
+            }`}
+          >
+            카테고리 검토 ({categoryReviews.length})
           </button>
         </div>
       )}
@@ -557,6 +591,106 @@ export function AdminSosModerationPage() {
                   </div>
                 </li>
               ))
+            )}
+          </ul>
+        ) : spotSub === 'category' ? (
+          /* ── 카테고리 검토 탭 ── */
+          <ul className="flex flex-col gap-3">
+            {categoryReviews.length === 0 ? (
+              <p className="py-10 text-center text-[13px] text-white/40">
+                검토가 필요한 카테고리가 없어요. 🎉
+              </p>
+            ) : (
+              categoryReviews.map((r) => {
+                const catMeta = PHOTO_CATEGORIES.find((c) => c.key === r.ai_category);
+                const userMeta = PHOTO_CATEGORIES.find((c) => c.key === r.user_category);
+                const adminMeta = PHOTO_CATEGORIES.find((c) => c.key === r.admin_category);
+                const conf = r.ai_category_confidence;
+                const confPct = conf !== null ? Math.round(conf * 100) : null;
+                return (
+                  <li
+                    key={r.id}
+                    className="rounded-2xl border border-amber-500/20 bg-white/[0.03] p-3.5"
+                  >
+                    <div className="flex gap-3">
+                      <img
+                        src={r.photo_url}
+                        alt=""
+                        className="h-24 w-24 shrink-0 rounded-xl object-cover"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[14px] font-bold text-white">{r.place_name ?? '(제목 없음)'}</p>
+                        {r.description ? (
+                          <p className="mt-0.5 text-[12px] text-white/60">{r.description}</p>
+                        ) : null}
+                        <div className="mt-2 flex flex-wrap gap-1.5 text-[11px]">
+                          <span className="rounded-full px-2 py-0.5 font-semibold"
+                            style={{ background: 'rgba(251,191,36,0.15)', color: '#FCD34D' }}>
+                            AI: {catMeta ? `${catMeta.emoji} ${catMeta.label}` : (r.ai_category ?? '없음')}
+                            {confPct !== null ? ` (${confPct}%)` : ''}
+                          </span>
+                          {r.user_category && (
+                            <span className="rounded-full px-2 py-0.5 font-semibold"
+                              style={{ background: 'rgba(0,240,255,0.10)', color: '#67E8F9' }}>
+                              사용자: {userMeta ? `${userMeta.emoji} ${userMeta.label}` : r.user_category}
+                            </span>
+                          )}
+                          {r.admin_category && (
+                            <span className="rounded-full px-2 py-0.5 font-semibold"
+                              style={{ background: 'rgba(167,243,208,0.15)', color: '#6EE7B7' }}>
+                              관리자: {adminMeta ? `${adminMeta.emoji} ${adminMeta.label}` : r.admin_category}
+                            </span>
+                          )}
+                        </div>
+                        <p className="mt-1 font-mono text-[10px] text-white/30">
+                          {r.id.slice(0, 8)}… · {new Date(r.created_at).toLocaleString('ko-KR')}
+                        </p>
+                      </div>
+                    </div>
+                    {/* 카테고리 선택 드롭다운 */}
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <Tag size={13} className="shrink-0 text-amber-300/70" />
+                      <span className="text-[12px] text-white/50">카테고리 수정:</span>
+                      <select
+                        disabled={catBusyId === r.id}
+                        defaultValue={r.admin_category ?? r.user_category ?? r.ai_category ?? ''}
+                        onChange={async (e) => {
+                          const val = e.target.value;
+                          if (!val) return;
+                          const sb = getSupabase();
+                          if (!sb) return;
+                          setCatBusyId(r.id);
+                          try {
+                            const { data, error } = await sb.rpc('admin_set_spot_category', {
+                              p_report_id: r.id,
+                              p_category: val,
+                            });
+                            if (error || (data as { ok?: boolean })?.ok !== true) {
+                              toast.error('카테고리 수정 실패', { description: error?.message ?? '오류' });
+                              return;
+                            }
+                            toast.success('카테고리를 수정했어요.');
+                            await load();
+                          } finally {
+                            setCatBusyId(null);
+                          }
+                        }}
+                        className="rounded-lg border border-white/15 bg-[#1a1a28] px-2.5 py-1.5 text-[12px] text-white/80 outline-none focus:border-amber-400/50"
+                      >
+                        <option value="">-- 선택 --</option>
+                        {PHOTO_CATEGORIES.map((c) => (
+                          <option key={c.key} value={c.key}>
+                            {c.emoji} {c.label}
+                          </option>
+                        ))}
+                      </select>
+                      {catBusyId === r.id && (
+                        <Loader2 size={14} className="animate-spin text-amber-300/70" />
+                      )}
+                    </div>
+                  </li>
+                );
+              })
             )}
           </ul>
         ) : (
