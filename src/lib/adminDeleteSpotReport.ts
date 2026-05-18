@@ -10,14 +10,9 @@ const RPC_ERROR_KO: Record<string, string> = {
 
 type DeleteResult = { ok: true } | { ok: false; message: string };
 
-function parseRpcBody(data: unknown): { ok?: boolean; error?: string; detail?: string } {
+function parseRpcBody(data: unknown): Record<string, unknown> {
   if (!data || typeof data !== 'object') return {};
-  const o = data as Record<string, unknown>;
-  return {
-    ok: typeof o.ok === 'boolean' ? o.ok : undefined,
-    error: typeof o.error === 'string' ? o.error : undefined,
-    detail: typeof o.detail === 'string' ? o.detail : undefined,
-  };
+  return data as Record<string, unknown>;
 }
 
 /** 관리자: spot_reports + spot-photos Storage 즉시 삭제 (RPC 우선, Edge는 예비) */
@@ -33,12 +28,23 @@ export async function adminDeleteSpotReport(
   });
 
   if (!rpcError) {
-    const body = parseRpcBody(rpcData);
-    if (body.ok) return { ok: true };
-    const code = body.error ?? '';
+    const body = parseRpcBody(rpcData) as Record<string, unknown>;
+    if (body.ok) {
+      // RPC가 반환한 photo_path로 Storage 파일도 삭제
+      const photoPath = typeof body.photo_path === 'string' ? body.photo_path : null;
+      if (photoPath) {
+        await sb.storage.from('spot-photos').remove([photoPath]);
+      }
+      return { ok: true };
+    }
+    const code = (body.error as string) ?? '';
     return {
       ok: false,
-      message: body.detail?.trim() || RPC_ERROR_KO[code] || code || '삭제에 실패했어요.',
+      message:
+        (body.detail as string | undefined)?.trim() ||
+        RPC_ERROR_KO[code] ||
+        code ||
+        '삭제에 실패했어요.',
     };
   }
 
@@ -64,9 +70,13 @@ export async function adminDeleteSpotReport(
   }
   const fnBody = parseRpcBody(fnData);
   if (fnBody.ok) return { ok: true };
-  const code = fnBody.error ?? '';
+  const code = (fnBody.error as string) ?? '';
   return {
     ok: false,
-    message: fnBody.detail?.trim() || RPC_ERROR_KO[code] || code || '삭제에 실패했어요.',
+    message:
+      (fnBody.detail as string | undefined)?.trim() ||
+      RPC_ERROR_KO[code] ||
+      code ||
+      '삭제에 실패했어요.',
   };
 }

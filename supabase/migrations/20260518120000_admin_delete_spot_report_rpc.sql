@@ -33,7 +33,7 @@ create or replace function public.admin_delete_spot_report(p_report_id uuid)
 returns json
 language plpgsql
 security definer
-set search_path = public, storage
+set search_path = public
 as $$
 declare
   v_url text;
@@ -57,11 +57,6 @@ begin
   end if;
 
   v_path := public.spot_photos_object_path_from_url(v_url);
-  if v_path is not null then
-    delete from storage.objects
-    where bucket_id = 'spot-photos'
-      and name = v_path;
-  end if;
 
   delete from public.spot_reports where id = p_report_id;
   get diagnostics v_deleted = row_count;
@@ -70,7 +65,8 @@ begin
     return json_build_object('ok', false, 'error', 'not_found_after_delete');
   end if;
 
-  return json_build_object('ok', true, 'deleted', true);
+  -- Storage 파일 경로를 클라이언트에 반환 (클라이언트가 Storage API로 삭제)
+  return json_build_object('ok', true, 'deleted', true, 'photo_path', v_path);
 exception
   when others then
     return json_build_object('ok', false, 'error', 'delete_failed', 'detail', sqlerrm);
