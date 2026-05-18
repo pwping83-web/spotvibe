@@ -10,6 +10,7 @@ import {
   type NearbyLivePhoto,
 } from '@/hooks/useNearbyLivePhotos';
 import { addSpotReportLike, removeSpotReportLike } from '@/lib/spotReportLikes';
+import { adminDeleteSpotReport } from '@/lib/adminDeleteSpotReport';
 import { getSupabase, isSupabaseConfigured } from '@/lib/supabaseClient';
 import { FaceMosaicImage } from './FaceMosaicImage';
 import { SpotReportLikeChip } from './SpotReportLikeChip';
@@ -299,19 +300,10 @@ export function NearbyLivePhotosModal({
     }
     setAdminDeleteBusy(true);
     try {
-      const { data, error } = await sb.functions.invoke('admin-delete-spot-report', {
-        body: { reportId: lightbox.id },
-      });
-      if (error) {
-        console.error('admin-delete-spot-report:', error);
-        toast.error('삭제에 실패했어요.', { description: error.message });
-        return;
-      }
-      const row = data as { ok?: boolean; error?: string; detail?: string } | null;
-      if (!row?.ok) {
-        toast.error('삭제에 실패했어요.', {
-          description: row?.detail ?? row?.error ?? '권한·네트워크를 확인해 주세요.',
-        });
+      const result = await adminDeleteSpotReport(sb, lightbox.id);
+      if (!result.ok) {
+        console.error('adminDeleteSpotReport:', result.message);
+        toast.error('삭제에 실패했어요.', { description: result.message });
         return;
       }
       toast.success('제보와 원본 파일을 삭제했어요.');
