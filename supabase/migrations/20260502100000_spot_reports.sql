@@ -26,25 +26,29 @@ create index if not exists spot_reports_status_created_idx
 -- RLS
 alter table spot_reports enable row level security;
 
--- 로그인 사용자는 verified 제보를 모두 읽을 수 있음
+-- 로그인 사용자는 verified 제보를 모두 읽을 수 있음 (원격에 이미 있으면 재적용)
+drop policy if exists "read verified reports" on spot_reports;
 create policy "read verified reports"
   on spot_reports for select
   to authenticated
   using (status = 'verified');
 
 -- 본인 제보는 pending 포함 모두 읽기 가능
+drop policy if exists "read own reports" on spot_reports;
 create policy "read own reports"
   on spot_reports for select
   to authenticated
   using (user_id = auth.uid());
 
 -- 로그인 사용자는 본인 제보 insert 가능
+drop policy if exists "insert own report" on spot_reports;
 create policy "insert own report"
   on spot_reports for insert
   to authenticated
   with check (user_id = auth.uid());
 
 -- 본인 제보만 삭제 가능
+drop policy if exists "delete own report" on spot_reports;
 create policy "delete own report"
   on spot_reports for delete
   to authenticated
