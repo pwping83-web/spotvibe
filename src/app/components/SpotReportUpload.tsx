@@ -42,11 +42,11 @@ const SPOTVIBE_ADMIN_AI_LS = 'spotvibe_admin_ai_spot_verify';
  *
  * 복구: 각각 false 로 변경
  */
-const SKIP_SPOT_AI_VERIFY = true;
-// ↑ [1단계 끄기] false 로 바꾸면 AI 텍스트·비전 검증 복구
+const SKIP_SPOT_AI_VERIFY = false;
+// ↑ [1단계 끄기] true 로 바꾸면 AI 텍스트·비전 검증 건너뜀(테스트용)
 
-const SKIP_AUTOVERIFY_RPC = true;
-// ↑ [2단계 끄기] false 로 바꾸면 autoverify_own_spot_report RPC 복구
+const SKIP_AUTOVERIFY_RPC = false;
+// ↑ [2단계 끄기] true 로 바꾸면 autoverify RPC 건너뛰고 바로 verified 저장(테스트용)
 
 /* STEP1-AI-BEGIN — 블록 주석으로 끄려면 위를 true 로 두거나, 아래 if (!SKIP_SPOT_AI_VERIFY) 안만 주석 처리 */
 
