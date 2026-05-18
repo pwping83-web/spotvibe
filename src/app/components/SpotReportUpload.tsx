@@ -26,6 +26,18 @@ import {
 
 const SPOTVIBE_ADMIN_AI_LS = 'spotvibe_admin_ai_spot_verify';
 
+/**
+ * ━━ 사진등록 · AI 검증 테스트 스위치 ━━
+ * 1) 주석처리(끄기):  `SKIP_SPOT_AI_VERIFY = true`  ← 지금
+ * 2) 주석해제(복구):  `SKIP_SPOT_AI_VERIFY = false`
+ *
+ * 끄면: 제목 Edge(moderate-user-content), held/block, 관리자 비전(ai-verify-spot-report) 미호출
+ * 유지: 얼굴 모자이크, GPS, Storage, autoverify_own_spot_report(RPC 자동 승인)
+ */
+const SKIP_SPOT_AI_VERIFY = true;
+
+/* STEP1-AI-BEGIN — 블록 주석으로 끄려면 위를 true 로 두거나, 아래 if (!SKIP_SPOT_AI_VERIFY) 안만 주석 처리 */
+
 function errorInstanceName(err: unknown): string {
   return err && typeof err === 'object' && 'name' in err && typeof (err as { name: unknown }).name === 'string'
     ? (err as { name: string }).name
@@ -611,40 +623,44 @@ export function SpotReportUpload({
 
     let textDecision: 'allow' | 'held' | 'block' = 'allow';
     let textReason = '';
-    const { data: textModData, error: textModErr } = await sb.functions.invoke('moderate-user-content', {
-      body: {
-        context: 'spot_report',
-        placeTitle: titleTrim,
-        description: description.trim(),
-      },
-    });
-    if (
-      !textModErr &&
-      textModData &&
-      typeof textModData === 'object' &&
-      (textModData as { ok?: boolean }).ok === true
-    ) {
-      const d = String((textModData as { decision?: string }).decision ?? '').toLowerCase();
-      if (d === 'block' || d === 'held' || d === 'allow') {
-        textDecision = d;
-        textReason = String((textModData as { reason?: string }).reason ?? '');
-      }
-    } else if (textModErr) {
-      // 네트워크·Groq 장애 시 업로드는 진행(서버 DB·관리자 큐가 2차 방어)
-      console.warn('moderate-user-content:', textModErr);
-      toast.message('제목 AI 검토를 건너뛰고 등록을 진행해요.', {
-        description: '연결이 불안정할 때예요. 사진·제목은 그대로 올라갑니다.',
-      });
-    }
 
-    if (textDecision === 'block') {
-      setUploadState('picking');
-      toast.error('게시할 수 없는 내용이에요.', {
-        description:
-          textReason.trim() ||
-          'AI가 부적절한 제목·설명으로 판단했어요. 홍보·음란·범죄 유도 등은 올릴 수 없어요.',
+    if (SKIP_SPOT_AI_VERIFY) {
+      console.info('[SpotReport] SKIP_SPOT_AI_VERIFY: 제목·사진 AI 검증 건너뜀(테스트)');
+    } else {
+      const { data: textModData, error: textModErr } = await sb.functions.invoke('moderate-user-content', {
+        body: {
+          context: 'spot_report',
+          placeTitle: titleTrim,
+          description: description.trim(),
+        },
       });
-      return;
+      if (
+        !textModErr &&
+        textModData &&
+        typeof textModData === 'object' &&
+        (textModData as { ok?: boolean }).ok === true
+      ) {
+        const d = String((textModData as { decision?: string }).decision ?? '').toLowerCase();
+        if (d === 'block' || d === 'held' || d === 'allow') {
+          textDecision = d;
+          textReason = String((textModData as { reason?: string }).reason ?? '');
+        }
+      } else if (textModErr) {
+        console.warn('moderate-user-content:', textModErr);
+        toast.message('제목 AI 검토를 건너뛰고 등록을 진행해요.', {
+          description: '연결이 불안정할 때예요. 사진·제목은 그대로 올라갑니다.',
+        });
+      }
+
+      if (textDecision === 'block') {
+        setUploadState('picking');
+        toast.error('게시할 수 없는 내용이에요.', {
+          description:
+            textReason.trim() ||
+            'AI가 부적절한 제목·설명으로 판단했어요. 홍보·음란·범죄 유도 등은 올릴 수 없어요.',
+        });
+        return;
+      }
     }
 
     let fileToUpload = selectedFile;
@@ -756,7 +772,7 @@ export function SpotReportUpload({
       return;
     }
 
-    if (textDecision === 'held') {
+    if (!SKIP_SPOT_AI_VERIFY && textDecision === 'held') {
       setVerifyUiKind('none');
       setUploadState('done');
       toast.success('접수됐어요. 내용이 검토 중입니다.', {
@@ -772,8 +788,8 @@ export function SpotReportUpload({
       return;
     }
 
-    /** 관리자 + AI 판독 ON이면 카메라·파일 모두 Edge 비전 검사 (OFF면 기존처럼 RPC 자동 승인) */
-    const useAiEdge = isAdmin && adminAiPhotoVerify;
+    /** 관리자 + AI 판독 ON이면 카메라·파일 모두 Edge 비전 검사 (SKIP_SPOT_AI_VERIFY 시 항상 RPC만) */
+    const useAiEdge = !SKIP_SPOT_AI_VERIFY && isAdmin && adminAiPhotoVerify;
     setVerifyUiKind(useAiEdge ? 'ai' : 'rpc');
     setUploadState('verifying');
 
@@ -887,6 +903,8 @@ export function SpotReportUpload({
       }
     }
   }
+
+  /* STEP1-AI-END */
 
   const isProcessing = uploadState === 'uploading' || uploadState === 'verifying';
   const contentBlocked = useMemo(
