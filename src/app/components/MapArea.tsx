@@ -238,7 +238,7 @@ function readPreferDarkMapBase(): boolean {
 }
 
 /** 카카오 로드맵은 공식 다크 타입이 없음 → 컨테이너에 CSS filter로 앱 다크 톤에 맞춤 */
-const KAKAO_MAP_DEFAULT_CSS_FILTER = 'brightness(0.72) contrast(1.1) saturate(0.9)';
+const KAKAO_MAP_DEFAULT_CSS_FILTER = 'brightness(0.88) contrast(1.06) saturate(0.28)';
 
 function kakaoMapHostStyle(): React.CSSProperties {
   const base: React.CSSProperties = { width: '100%', height: '100%' };
