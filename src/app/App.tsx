@@ -547,6 +547,40 @@ function SpotVibeMain() {
   /** 지도가 알려 주는 내 좌표(브라우저 GPS·10분 홀드). DB lastKnown보다 우선해 SOS와 맞춤 */
   const [mapClientMyLocation, setMapClientMyLocation] = useState<{ lat: number; lng: number } | null>(null);
 
+  /** GPS 위치가 잡힐 때마다 사용자별 localStorage에 기록 */
+  useEffect(() => {
+    if (!userId || !mapClientMyLocation) return;
+    try {
+      window.localStorage.setItem(
+        `spotvibe-last-location-v1:${userId}`,
+        JSON.stringify([mapClientMyLocation.lat, mapClientMyLocation.lng]),
+      );
+    } catch { /* noop */ }
+  }, [userId, mapClientMyLocation]);
+
+  /**
+   * 프로필 로드 완료 후, DB에 explore 좌표가 없는 경우(my_location 모드)
+   * localStorage에 저장된 마지막 GPS 위치로 지도를 복원한다.
+   */
+  useEffect(() => {
+    if (!mainProfileHydrated || !userId) return;
+    if (locationMode !== 'my_location') return;
+    try {
+      const raw = window.localStorage.getItem(`spotvibe-last-location-v1:${userId}`);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as unknown;
+      if (
+        Array.isArray(parsed) &&
+        parsed.length === 2 &&
+        isValidProfileLatLng(parsed[0], parsed[1])
+      ) {
+        setExploreAnchor([parsed[0] as number, parsed[1] as number]);
+      }
+    } catch { /* noop */ }
+  // mainProfileHydrated·userId 변경 시 1회만 실행 (locationMode는 같은 렌더에서 확정됨)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mainProfileHydrated, userId]);
+
   const sosCenter = useMemo((): [number, number] | null => {
     if (locationMode === 'explore') return exploreAnchor;
     if (mapClientMyLocation) return [mapClientMyLocation.lat, mapClientMyLocation.lng];
