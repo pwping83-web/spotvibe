@@ -24,6 +24,7 @@ import {
   Search,
   Info,
   BookOpen,
+  LayoutGrid,
 } from 'lucide-react';
 import { SpotReportUpload } from './SpotReportUpload';
 import { ExploreRegionFlowPanel } from './ExploreRegionFlowPanel';
@@ -3244,6 +3245,27 @@ export function MapArea({
         </AnimatePresence>
         {/* 지역 프리셋 — 좌하단 고정 */}
         <div className="pointer-events-auto absolute bottom-28 left-6 z-[415] flex flex-col items-start gap-1.5">
+          {/* 더보기 — 좌하단 지역 버튼 위, 우측 시설 버튼 컬럼과 분리 */}
+          {!activeRec && !quickPanelOpen && (
+            <motion.button
+              type="button"
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setQuickPanelOpen((o) => !o)}
+              className="flex items-center gap-1.5 rounded-full px-3.5 py-2.5 text-[12px] font-bold"
+              style={{
+                background: 'rgba(12,12,20,0.88)',
+                border: '1px solid rgba(255,255,255,0.13)',
+                backdropFilter: 'blur(14px)',
+                boxShadow: '0 2px 12px rgba(0,0,0,0.45)',
+                color: 'rgba(255,255,255,0.65)',
+              }}
+              aria-label="주변 정보 더보기"
+              aria-expanded={quickPanelOpen}
+            >
+              <LayoutGrid size={15} strokeWidth={2.3} />
+              <span>더보기</span>
+            </motion.button>
+          )}
           <button
             type="button"
             onClick={() => setRegionPresetPanelOpen((o) => !o)}
@@ -3308,50 +3330,6 @@ export function MapArea({
         </div>
 
         <div className="pointer-events-auto absolute bottom-28 right-4 flex max-w-[220px] flex-col items-end gap-2">
-          {/* 더보기 — 우측 컬럼 최상단, 내 위치 찾기와 같은 열, 겹침 없음 */}
-          {!activeRec && !quickPanelOpen && (
-            <motion.button
-              type="button"
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setQuickPanelOpen((o) => !o)}
-              className="flex items-center gap-1.5 rounded-full px-3 py-2.5 text-[11.5px] font-bold"
-              style={{
-                background: 'rgba(12,12,20,0.88)',
-                border: '1px solid rgba(255,255,255,0.10)',
-                backdropFilter: 'blur(14px)',
-                boxShadow: '0 2px 12px rgba(0,0,0,0.45)',
-                color: 'rgba(255,255,255,0.55)',
-              }}
-              aria-label="주변 정보 더보기"
-              aria-expanded={quickPanelOpen}
-            >
-              <span className="text-[13px] font-black leading-none">›</span>
-              <span>더보기</span>
-            </motion.button>
-          )}
-          {/* ℹ️ 실시간 위치 안내 — 실제 모드만 */}
-          {!simOn && (
-            <>
-              {locationFactsOpen && (
-                <div className="max-h-[min(52vh,320px)] w-[min(92vw,220px)] overflow-y-auto rounded-2xl border border-white/12 bg-[#12121A]/95 p-3.5 shadow-xl backdrop-blur-md">
-                  <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-white/35">
-                    실시간 위치·분포
-                  </p>
-                  <LocationRealtimeInfoBlock className="text-[10.5px] leading-snug text-white/55" />
-                </div>
-              )}
-              <button
-                type="button"
-                aria-expanded={locationFactsOpen}
-                aria-label="실시간 위치 안내 열기·닫기"
-                onClick={() => setLocationFactsOpen((o) => !o)}
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-[#1A1A24]/95 text-white/55 shadow-lg backdrop-blur-md transition-colors hover:bg-white/[0.08] hover:text-white/80"
-              >
-                <Info size={18} strokeWidth={2.2} />
-              </button>
-            </>
-          )}
-
           {/* 야외 운동시설 — 두 모드 모두 표시 */}
           <motion.button
             type="button"
@@ -3655,7 +3633,7 @@ export function MapArea({
                   setQuickPanelOpen(false);
                   navigate('/manual');
                 }}
-                className="mx-4 mb-4 flex items-center gap-3 rounded-xl px-4 py-3 text-left"
+                className="mx-4 mb-2 flex items-center gap-3 rounded-xl px-4 py-3 text-left"
                 style={{ background: 'rgba(0,240,255,0.06)', border: '1px solid rgba(0,240,255,0.22)' }}
               >
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#00F0FF]/10">
@@ -3667,6 +3645,46 @@ export function MapArea({
                 </div>
                 <ChevronRight size={16} className="shrink-0 text-white/25" />
               </motion.button>
+              {/* 실시간 위치·분포 안내 — 실제 모드만 */}
+              {!simOn && (
+                <div className="mx-4 mb-4">
+                  <motion.button
+                    type="button"
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => setLocationFactsOpen((o) => !o)}
+                    className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left"
+                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+                    aria-expanded={locationFactsOpen}
+                  >
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/[0.06]">
+                      <Info size={18} className="text-white/55" />
+                    </span>
+                    <div className="flex-1">
+                      <p className="text-[13px] font-bold text-white">실시간 위치·분포 안내</p>
+                      <p className="mt-0.5 text-[11px] text-white/35">현재 탐색 범위 내 분포 정보</p>
+                    </div>
+                    <ChevronDown
+                      size={16}
+                      className={`shrink-0 text-white/30 transition-transform ${locationFactsOpen ? 'rotate-180' : ''}`}
+                    />
+                  </motion.button>
+                  <AnimatePresence>
+                    {locationFactsOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="mt-2 rounded-xl border border-white/10 bg-[#12121A]/90 p-3.5">
+                          <LocationRealtimeInfoBlock className="text-[10.5px] leading-snug text-white/55" />
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              )}
               <p className="mb-3 text-[11px] font-bold uppercase tracking-widest text-white/30">위치 제보</p>
               <div className="flex flex-col gap-2">
                 {[
