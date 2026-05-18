@@ -1868,9 +1868,9 @@ export function MapArea({
     return { lat: exploreCenter[0], lng: exploreCenter[1] };
   }, [mapDisplayMyLocation, exploreCenter]);
 
-  /** 취약계층(시각장애인) 데모 마커 근접 시 진동·짧은 알림음 — 4시간당 1회 */
+  /** 취약계층(시각장애인) 데모 마커 근접 시 진동·짧은 알림음 — 시뮬레이션 모드 전용, 4시간당 1회 */
   useEffect(() => {
-    if (mapMinimalChrome || zoomLevel < 13) return;
+    if (!simOn || mapMinimalChrome || zoomLevel < 13) return;
     const me = mapDisplayMyLocation;
     if (!me) return;
     const t = simWanderTick * 0.018;
@@ -2777,8 +2777,8 @@ export function MapArea({
           </>
         )}
 
-        {/* ─── 취약계층 마커 — 버튼 없이 항상 표시 (zoom ≥ 13), 실시간 위치 드리프트 ─── */}
-        {zoomLevel >= 13 && (() => {
+        {/* ─── 취약계층 마커 — 시뮬레이션 모드에서만 표시 (zoom ≥ 13) ─── */}
+        {simOn && zoomLevel >= 13 && (() => {
           const c = mapDisplayMyLocation ?? exploreCenter;
           const t = simWanderTick * 0.018;
           /* 각 마커마다 다른 주기·방향으로 천천히 이동 (실제 GPS 갱신 시뮬레이션) */
@@ -3509,25 +3509,27 @@ export function MapArea({
       {/* ─── 상단 버튼 행: 시각장애인 | SOS | 소화기 — 균일 간격 ─── */}
       {!mapMinimalChrome && (
         <div className="pointer-events-none absolute left-1/2 top-[4.65rem] z-[419] flex -translate-x-1/2 items-center gap-2">
-          {/* 시각장애인 마커 안내 */}
-          <motion.button
-            type="button"
-            whileTap={{ scale: 0.92 }}
-            animate={{ boxShadow: ['0 0 8px rgba(96,165,250,0.2)', '0 0 18px rgba(96,165,250,0.55)', '0 0 8px rgba(96,165,250,0.2)'] }}
-            transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
-            onClick={showVulnerableGuide}
-            className="pointer-events-auto relative flex h-11 items-center gap-1.5 rounded-2xl px-2.5 text-[11px] font-black shadow-lg"
-            style={{
-              border: '1px solid rgba(96,165,250,0.52)',
-              background: 'rgba(59,130,246,0.14)',
-              color: '#93C5FD',
-            }}
-            aria-label="시각장애인 특별 마커 안내 보기"
-            title="시각장애인 특별 마커 안내"
-          >
-            <span className="text-[13px] leading-none">🦯</span>
-            <span>보호망</span>
-          </motion.button>
+          {/* 시각장애인 마커 안내 — 시뮬레이션 모드에서만 표시 */}
+          {simOn && (
+            <motion.button
+              type="button"
+              whileTap={{ scale: 0.92 }}
+              animate={{ boxShadow: ['0 0 8px rgba(96,165,250,0.2)', '0 0 18px rgba(96,165,250,0.55)', '0 0 8px rgba(96,165,250,0.2)'] }}
+              transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+              onClick={showVulnerableGuide}
+              className="pointer-events-auto relative flex h-11 items-center gap-1.5 rounded-2xl px-2.5 text-[11px] font-black shadow-lg"
+              style={{
+                border: '1px solid rgba(96,165,250,0.52)',
+                background: 'rgba(59,130,246,0.14)',
+                color: '#93C5FD',
+              }}
+              aria-label="시각장애인 특별 마커 안내 보기"
+              title="시각장애인 특별 마커 안내"
+            >
+              <span className="text-[13px] leading-none">🦯</span>
+              <span>보호망</span>
+            </motion.button>
+          )}
 
           {/* SOS */}
           {onSosOpen && (
@@ -3571,7 +3573,7 @@ export function MapArea({
       )}
 
       <AnimatePresence>
-        {vulnerableGuideOpen && !mapMinimalChrome && (
+        {simOn && vulnerableGuideOpen && !mapMinimalChrome && (
           <motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
