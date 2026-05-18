@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import {
@@ -18,6 +18,11 @@ import { getSupabase } from '@/lib/supabaseClient';
 import { isSpotReportTextBlocked } from '@/lib/spotReportModeration';
 import { useAuth } from '@/app/App';
 import { buildFaceMosaicDataUrl, FaceMosaicImage } from './FaceMosaicImage';
+import {
+  isCoarsePointerDevice,
+  setSpotReportSheetSessionOpen,
+  spotReportSheetSessionOpen,
+} from '@/lib/spotReportSheetSession';
 
 const SPOTVIBE_ADMIN_AI_LS = 'spotvibe_admin_ai_spot_verify';
 
@@ -296,17 +301,23 @@ export function SpotReportUpload({
   const sheetScrollRef = useRef<HTMLDivElement>(null);
   const adminFileInputRef = useRef<HTMLInputElement>(null);
   const cameraStreamRef = useRef<MediaStream | null>(null);
-  /** 제목·설명 포커스 직후 배경 탭이 닫기로 이어지는 것 방지(키보드·viewport 리사이즈) */
-  const sheetFormFocusGuardRef = useRef(false);
-  const sheetFormFocusGuardTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isMobileTouch = useMemo(() => isCoarsePointerDevice(), []);
   const [uploadState, setUploadState] = useState<UploadState>('idle');
-  const [showSheet, setShowSheet] = useState(false);
+  const [showSheet, setShowSheet] = useState(() => spotReportSheetSessionOpen);
+  const [mobileInputUnlock, setMobileInputUnlock] = useState(false);
+
+  const setSheetOpen = (open: boolean) => {
+    setSpotReportSheetSessionOpen(open);
+    setShowSheet(open);
+    if (!open) setMobileInputUnlock(false);
+  };
   const [cameraOpen, setCameraOpen] = useState(false);
   const [cameraVideoReady, setCameraVideoReady] = useState(false);
-  /** 모바일 키보드 — visualViewport 높이에 맞춰 시트 max-height만 조정(시트 bottom 이동은 고스트 클릭 유발) */
-  const [viewportHeight, setViewportHeight] = useState(() =>
-    typeof window !== 'undefined' ? window.innerHeight : 720,
-  );
+  /** 모바일 키보드 — visualViewport 전체를 시트가 덮도록(top+height), 상단 딤 고스트 탭 방지 */
+  const [viewportRect, setViewportRect] = useState(() => ({
+    top: 0,
+    height: typeof window !== 'undefined' ? window.innerHeight : 720,
+  }));
   const [preview, setPreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [pickSource, setPickSource] = useState<PickSource | null>(null);
@@ -355,30 +366,48 @@ export function SpotReportUpload({
 
   useEffect(() => {
     if (!showSheet) {
-      setViewportHeight(typeof window !== 'undefined' ? window.innerHeight : 720);
-      sheetFormFocusGuardRef.current = false;
-      if (sheetFormFocusGuardTimerRef.current) {
-        clearTimeout(sheetFormFocusGuardTimerRef.current);
-        sheetFormFocusGuardTimerRef.current = null;
-      }
+      setViewportRect({ top: 0, height: window.innerHeight });
       return;
     }
     const prevOverflow = document.body.style.overflow;
+    const prevPosition = document.body.style.position;
+    const prevTop = document.body.style.top;
+    const prevWidth = document.body.style.width;
+    const scrollY = window.scrollY;
     document.body.style.overflow = 'hidden';
+    if (isMobileTouch) {
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+    }
     const vv = window.visualViewport;
-    const syncViewportHeight = () => {
-      setViewportHeight(vv?.height ?? window.innerHeight);
+    const syncViewportRect = () => {
+      setViewportRect({
+        top: vv?.offsetTop ?? 0,
+        height: vv?.height ?? window.innerHeight,
+      });
     };
-    syncViewportHeight();
-    vv?.addEventListener('resize', syncViewportHeight);
-    vv?.addEventListener('scroll', syncViewportHeight);
+    /** 갤럭시·안드로이드: visualViewport scroll이 지도/바텀시트를 밀어 고스트 탭 유발 → 차단 */
+    const onVvScroll = (e: Event) => {
+      if (isMobileTouch) e.preventDefault();
+      syncViewportRect();
+    };
+    syncViewportRect();
+    vv?.addEventListener('resize', syncViewportRect);
+    vv?.addEventListener('scroll', onVvScroll, { passive: false });
+    window.addEventListener('resize', syncViewportRect);
     return () => {
       document.body.style.overflow = prevOverflow;
-      vv?.removeEventListener('resize', syncViewportHeight);
-      vv?.removeEventListener('scroll', syncViewportHeight);
-      setViewportHeight(window.innerHeight);
+      document.body.style.position = prevPosition;
+      document.body.style.top = prevTop;
+      document.body.style.width = prevWidth;
+      if (isMobileTouch) window.scrollTo(0, scrollY);
+      vv?.removeEventListener('resize', syncViewportRect);
+      vv?.removeEventListener('scroll', onVvScroll);
+      window.removeEventListener('resize', syncViewportRect);
+      setViewportRect({ top: 0, height: window.innerHeight });
     };
-  }, [showSheet]);
+  }, [showSheet, isMobileTouch]);
 
   useEffect(() => {
     setSpotReportLegalAck(false);
@@ -416,7 +445,7 @@ export function SpotReportUpload({
       toast.error('로그인이 필요해요.');
       return;
     }
-    setShowSheet(true);
+    setSheetOpen(true);
   }
 
   async function openSpotCamera() {
@@ -508,11 +537,12 @@ export function SpotReportUpload({
     setUploadState('picking');
   }
 
-  function handleCancel() {
+  /** 제보 시트는 우측 X로만 닫힘 — 배경·자동 닫기 없음 */
+  function closeSheetByUser() {
     stopCameraTracks();
     setCameraOpen(false);
     revokePreview();
-    setShowSheet(false);
+    setSheetOpen(false);
     setPreview(null);
     setSelectedFile(null);
     setPlaceName('');
@@ -739,7 +769,6 @@ export function SpotReportUpload({
       setPlaceName('');
       setDescription('');
       onReportSubmitted?.();
-      setTimeout(handleCancel, 1800);
       return;
     }
 
@@ -789,7 +818,6 @@ export function SpotReportUpload({
         setUploadState('done');
         toast.success(`제보 완료! +10 포인트 적립 ✅  ${label}`);
         onReportSubmitted?.();
-        setTimeout(handleCancel, 1500);
         return;
       }
 
@@ -842,7 +870,6 @@ export function SpotReportUpload({
       setUploadState('done');
       toast.success(`제보 완료! +10 포인트 적립 ✅  ${label}`);
       onReportSubmitted?.();
-      setTimeout(handleCancel, 1500);
     } catch (err) {
       console.error('spot report finalize error:', err);
       setVerifyUiKind('none');
@@ -878,68 +905,94 @@ export function SpotReportUpload({
     ? undefined
     : 'max(1.25rem, calc(5.75rem + env(safe-area-inset-bottom, 0px)))';
 
-  function armSheetFormFocusGuard() {
-    sheetFormFocusGuardRef.current = true;
-    if (sheetFormFocusGuardTimerRef.current) clearTimeout(sheetFormFocusGuardTimerRef.current);
-    sheetFormFocusGuardTimerRef.current = setTimeout(() => {
-      sheetFormFocusGuardRef.current = false;
-      sheetFormFocusGuardTimerRef.current = null;
-    }, 480);
-  }
-
   const handleSheetFieldFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    armSheetFormFocusGuard();
     scrollInputIntoSheet(e.target, sheetScrollRef.current);
   };
 
-  function handleSheetFieldBlur() {
-    armSheetFormFocusGuard();
-  }
+  const stopSheetPointerBubble = (e: React.SyntheticEvent) => {
+    e.stopPropagation();
+  };
 
-  function handleBackdropDismiss(e: React.PointerEvent<HTMLDivElement>) {
-    if (e.target !== e.currentTarget) return;
-    if (sheetFormFocusGuardRef.current) return;
-    handleCancel();
-  }
+  /** 갤럭시 등: 첫 탭에 키보드·뷰포트 점프로 고스트 클릭 나는 경우 완화 */
+  const unlockMobileField = (e: React.TouchEvent<HTMLInputElement>) => {
+    stopSheetPointerBubble(e);
+    setMobileInputUnlock(true);
+    const el = e.currentTarget;
+    window.requestAnimationFrame(() => {
+      el.focus({ preventScroll: true });
+    });
+  };
 
-  const sheetMaxHeightPx = Math.min(720, Math.round(viewportHeight * 0.92));
+  const sheetLayoutStyle: CSSProperties = isMobileTouch
+    ? {
+        top: viewportRect.top,
+        left: 0,
+        right: 0,
+        bottom: 'auto',
+        width: '100%',
+        height: viewportRect.height,
+        maxHeight: viewportRect.height,
+      }
+    : {
+        top: 'auto',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: 'auto',
+        maxHeight: Math.min(720, Math.round(viewportRect.height * 0.92)),
+      };
 
   const sheetPortalContent = (
     <AnimatePresence>
       {showSheet && (
-          <>
-            {/* 딤 배경 */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[430] touch-none"
+            role="presentation"
+          >
+            {/* 딤 — 탭 불가(배경 탭으로 닫히지 않음) */}
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[430] bg-black/65"
+              className="pointer-events-none absolute inset-0 bg-black/65"
               aria-hidden
-              onPointerDown={handleBackdropDismiss}
             />
 
             <motion.div
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-              className="fixed bottom-0 left-0 right-0 z-[440] flex flex-col rounded-t-2xl border-t border-white/10 bg-[#13131C] shadow-[0_-12px_48px_rgba(0,0,0,0.5)]"
-              style={{ maxHeight: sheetMaxHeightPx }}
-              onPointerDown={(e) => e.stopPropagation()}
+              initial={isMobileTouch ? { opacity: 0 } : { y: '100%' }}
+              animate={isMobileTouch ? { opacity: 1 } : { y: 0 }}
+              exit={isMobileTouch ? { opacity: 0 } : { y: '100%' }}
+              transition={
+                isMobileTouch
+                  ? { duration: 0.18, ease: 'easeOut' }
+                  : { type: 'spring', damping: 28, stiffness: 300 }
+              }
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="spot-report-sheet-title"
+              className="fixed z-[1] flex touch-auto flex-col rounded-t-2xl border-t border-white/10 bg-[#13131C] shadow-[0_-12px_48px_rgba(0,0,0,0.5)]"
+              style={sheetLayoutStyle}
+              onPointerDown={stopSheetPointerBubble}
+              onPointerUp={stopSheetPointerBubble}
+              onClick={stopSheetPointerBubble}
+              onTouchStart={stopSheetPointerBubble}
             >
               <div className="shrink-0 px-5 pb-2 pt-4">
                 <div className="mx-auto mb-2 h-1 w-10 rounded-full bg-white/20" />
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-[16px] font-bold text-white">현장 제보</p>
+                    <p id="spot-report-sheet-title" className="text-[16px] font-bold text-white">
+                      현장 제보
+                    </p>
                     <p className="mt-0.5 text-[11.5px] text-white/40">
                       제보마다 <span className="font-bold text-[#00F0FF]">+10 포인트</span> 적립돼요
                     </p>
                   </div>
                   <button
                     type="button"
-                    onClick={handleCancel}
+                    onClick={closeSheetByUser}
                     className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/08 text-white/50"
+                    aria-label="제보 창 닫기"
                   >
                     <X size={16} />
                   </button>
@@ -1069,11 +1122,15 @@ export function SpotReportUpload({
                         value={placeName}
                         onChange={(e) => setPlaceName(e.target.value)}
                         onFocus={handleSheetFieldFocus}
-                        onBlur={handleSheetFieldBlur}
+                        onPointerDown={stopSheetPointerBubble}
+                        onTouchStart={stopSheetPointerBubble}
+                        onTouchEnd={isMobileTouch ? unlockMobileField : undefined}
+                        readOnly={isMobileTouch && !mobileInputUnlock}
                         placeholder="예: 홍대 걷고싶은거리, 여의도 한강공원"
                         maxLength={50}
                         autoComplete="off"
-                        className="w-full rounded-xl border border-white/12 bg-white/[0.04] px-3 py-2.5 text-[14px] text-white placeholder-white/25 outline-none focus:border-[#00F0FF]/40"
+                        inputMode="text"
+                        className="w-full touch-manipulation rounded-xl border border-white/12 bg-white/[0.04] px-3 py-2.5 text-[14px] text-white placeholder-white/25 outline-none focus:border-[#00F0FF]/40"
                       />
                     </div>
                     <div className="shrink-0 scroll-mt-2">
@@ -1087,11 +1144,15 @@ export function SpotReportUpload({
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         onFocus={handleSheetFieldFocus}
-                        onBlur={handleSheetFieldBlur}
+                        onPointerDown={stopSheetPointerBubble}
+                        onTouchStart={stopSheetPointerBubble}
+                        onTouchEnd={isMobileTouch ? unlockMobileField : undefined}
+                        readOnly={isMobileTouch && !mobileInputUnlock}
                         placeholder="예: 버스킹 공연 중, 플리마켓 열렸어요"
                         maxLength={80}
                         autoComplete="off"
-                        className="w-full rounded-xl border border-white/12 bg-white/[0.04] px-3 py-2.5 text-[14px] text-white placeholder-white/25 outline-none focus:border-[#00F0FF]/40"
+                        inputMode="text"
+                        className="w-full touch-manipulation rounded-xl border border-white/12 bg-white/[0.04] px-3 py-2.5 text-[14px] text-white placeholder-white/25 outline-none focus:border-[#00F0FF]/40"
                       />
                     </div>
                     {contentBlocked ? (
@@ -1182,6 +1243,7 @@ export function SpotReportUpload({
                     <CheckCircle size={30} color="#4ADE80" />
                     <p className="text-[14px] font-bold text-white">제보 완료!</p>
                     <p className="text-[12px] text-[#00F0FF]">+10 포인트 적립됐어요</p>
+                    <p className="mt-1 text-[11px] text-white/40">우측 ✕ 버튼으로 닫아 주세요</p>
                   </div>
                 )}
 
@@ -1280,7 +1342,7 @@ export function SpotReportUpload({
                 </div>
               )}
             </motion.div>
-          </>
+          </motion.div>
         )}
       </AnimatePresence>
   );
