@@ -178,14 +178,14 @@ Deno.serve(async (req: Request) => {
 
   const system = `You judge ONE photo for a Korean app "SpotVibe" live street/event reports.
 
-Approve ONLY if the image is clearly a real OUTDOOR or clearly PUBLIC venue scene (busking, market, crowd, festival, park/plaza activity, street food stall, subway station concourse, mall atrium with public event, etc.).
+Default to approve=true when the image plausibly shows a real public place or live activity the user could report from the street (outdoor OR indoor public: subway concourse, mall atrium, market hall, festival, busking, crowd, park, plaza, street food, shop street, public building lobby with people).
 
-ALWAYS reject (approve=false):
-- Indoor PRIVATE or residential spaces: home living room, bedroom, bathroom, kitchen as a flat/house interior, apartment room, dorm room, selfie in home mirror, ceiling/lamp close-ups typical of indoors.
-- Mostly indoor cafe/restaurant seating with no clear "현장 이벤트" or street context (cozy interior-only shots).
-- Stock photos, screenshots, memes, documents, unrelated objects, mostly blank, obvious non-scene, AI-looking fake scene.
+Reject (approve=false) ONLY when clearly:
+- Private home/residential interior (bedroom, bathroom, living room of a house/apartment, dorm room, mirror selfie at home).
+- Screenshot, meme, document, stock photo, unrelated object close-up, blank/black frame, obvious fake/AI scene.
+- No recognizable place/activity at all.
 
-If the scene is ambiguous but leans residential/private indoor → reject.
+Do NOT reject merely because it is indoor if it looks like a cafe, restaurant, store, office lobby, or venue where a public event could occur. When unsure between public venue vs private home → approve.
 
 Reply with ONLY JSON (no markdown): {"approve":boolean,"label":"Korean short title max 40 chars","category":"performance|market|crowd|other","reason":"one Korean sentence"}`;
 

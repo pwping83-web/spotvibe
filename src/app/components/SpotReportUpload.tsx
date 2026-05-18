@@ -451,7 +451,8 @@ export function SpotReportUpload({
     if (!stream) {
       console.warn('getUserMedia failed:', lastErr);
       toast.error('카메라를 열 수 없어요.', {
-        description: '브라우저 설정에서 이 사이트의 카메라 권한을 허용해 주세요.',
+        description:
+          '브라우저 설정에서 이 사이트의 카메라 권한을 허용해 주세요. 안드로이드 Chrome은 주소창 자물쇠 → 사이트 설정 → 카메라, 그리고 HTTPS 접속이 필요해요.',
       });
       return;
     }
@@ -520,6 +521,13 @@ export function SpotReportUpload({
     setVerifyUiKind('none');
     setSpotReportLegalAck(false);
     setUploadState('idle');
+  }
+
+  /** AI·서버 반려 후에도 제보 시트·사진·제목 유지(카메라 첫 화면으로 되돌아가 창이 닫힌 것처럼 보이는 것 방지) */
+  function retainDraftForRetry() {
+    setVerifyUiKind('none');
+    setUploadState('picking');
+    setSpotReportLegalAck(false);
   }
 
   function onAdminFileInputChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -592,7 +600,11 @@ export function SpotReportUpload({
         textReason = String((textModData as { reason?: string }).reason ?? '');
       }
     } else if (textModErr) {
+      // 네트워크·Groq 장애 시 업로드는 진행(서버 DB·관리자 큐가 2차 방어)
       console.warn('moderate-user-content:', textModErr);
+      toast.message('제목 AI 검토를 건너뛰고 등록을 진행해요.', {
+        description: '연결이 불안정할 때예요. 사진·제목은 그대로 올라갑니다.',
+      });
     }
 
     if (textDecision === 'block') {
@@ -765,15 +777,11 @@ export function SpotReportUpload({
           return;
         }
         if (ai.rejected) {
-          toast.message('유형: AI가 현장 사진으로 인정하지 않음(반려)', { description: ai.reason ?? '' });
-          if (preview?.startsWith('blob:')) URL.revokeObjectURL(preview);
-          setSelectedFile(null);
-          setPreview(null);
-          setPickSource(null);
-          setPlaceName('');
-          setDescription('');
-          setVerifyUiKind('none');
-          setUploadState('idle');
+          toast.error('AI가 이 사진을 현장 제보로 승인하지 않았어요.', {
+            description: [ai.reason, '제목·설명을 고친 뒤 다시 「제보 등록」을 눌러 주세요.'].filter(Boolean).join(' '),
+            duration: 8000,
+          });
+          retainDraftForRetry();
           onReportSubmitted?.();
           return;
         }
@@ -801,30 +809,18 @@ export function SpotReportUpload({
       if (!rpc?.ok) {
         setVerifyUiKind('none');
         if (rpc?.error === 'title_required') {
-          toast.message('유형: 제목 없음(반려)', {
-            description: '장소 이름(제목)을 적은 뒤 다시 제보해 주세요.',
+          toast.error('장소 이름(제목)이 필요해요.', {
+            description: '제목을 적은 뒤 다시 「제보 등록」을 눌러 주세요.',
           });
-          if (preview?.startsWith('blob:')) URL.revokeObjectURL(preview);
-          setSelectedFile(null);
-          setPreview(null);
-          setPickSource(null);
-          setPlaceName('');
-          setDescription('');
-          setUploadState('idle');
+          retainDraftForRetry();
           onReportSubmitted?.();
           return;
         }
         if (rpc?.error === 'blocked_text') {
-          toast.message('유형: 부적절한 문구(반려)', {
-            description: '야동·음란·성희롱 등은 제목·설명에 쓸 수 없어요.',
+          toast.error('제목·설명을 수정해 주세요.', {
+            description: '부적절한 표현은 올릴 수 없어요. 문구만 고친 뒤 다시 등록해 주세요.',
           });
-          if (preview?.startsWith('blob:')) URL.revokeObjectURL(preview);
-          setSelectedFile(null);
-          setPreview(null);
-          setPickSource(null);
-          setPlaceName('');
-          setDescription('');
-          setUploadState('idle');
+          retainDraftForRetry();
           onReportSubmitted?.();
           return;
         }
@@ -994,7 +990,7 @@ export function SpotReportUpload({
                             </span>
                           </button>
                           <p className="mt-1.5 text-[10px] leading-snug text-amber-100/55">
-                            ON이면 <span className="font-semibold text-amber-100/80">카메라·파일</span> 제보 모두 사진·제목을 AI가 검사해요. OFF면 관리자도 바로 자동 승인돼요.
+                            ON이면 <span className="font-semibold text-amber-100/80">관리자 테스트용</span> 비전 AI가 실내·카페 등을 엄하게 반려할 수 있어요. 일반 이용자는 OFF와 같이 자동 승인됩니다.
                           </p>
                         </div>
                         <input

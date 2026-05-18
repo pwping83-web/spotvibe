@@ -143,11 +143,11 @@ Deno.serve(async (req: Request) => {
     `You moderate Korean text for SpotVibe "live street photo" reports (map app). Return ONLY JSON.
 
 decision:
-- "allow" — normal public event / place / street scene description.
-- "held" — suspicious shop promo unrelated to live event, mild sexual subtext, ambiguous scam/spam, needs human review (user may save but NOT public until admin).
+- "allow" — normal place names, street events, crowds, food stalls, parks, stations, short casual Korean (default for innocent text).
+- "held" — RARE: only obvious unrelated shop spam, pyramid/scam pitch, or strong sexual subtext needing human review (NOT for normal place names or typos).
 - "block" — explicit sexual solicitation, how-to crime, drug dealing, extreme slurs, CSAM references, terrorism instructions — must NOT post.
 
-Title and description may be short. Be strict on block, cautious on held.
+Title and description may be very short (e.g. "홍대", "버스킹"). Prefer "allow". Use "held" sparingly. Be strict only on "block".
 
 JSON only: {"decision":"allow"|"held"|"block","reason":"Korean one short sentence"}`;
 
@@ -221,7 +221,7 @@ JSON only: {"decision":"allow"|"block","reason":"Korean one short sentence"}`;
   if (context === 'sos_note') {
     if (decision !== 'allow' && decision !== 'block') decision = 'allow';
   } else {
-    if (!['allow', 'held', 'block'].includes(decision)) decision = 'held';
+    if (!['allow', 'held', 'block'].includes(decision)) decision = 'allow';
   }
 
   return jsonRes({
