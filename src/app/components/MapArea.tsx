@@ -37,7 +37,7 @@ import { TrashBinSheet, PUBLIC_TRASH_MAP_ICON } from './TrashBinSheet';
 import { SmokingRoomSheet, SMOKING_ROOM_MAP_ICON } from './SmokingRoomSheet';
 import { MarkerPhotoSheet, type MarkerItem } from './MarkerPhotoSheet';
 import { FacilityCategorySheet, OUTDOOR_GYM_MAP_ICON } from './FacilityCategorySheet';
-import { NEARBY_LIVE_PHOTOS_RADIUS_KM } from '@/hooks/useNearbyLivePhotos';
+import { NEARBY_LIVE_PHOTOS_RADIUS_KM, useNearbyLivePhotos } from '@/hooks/useNearbyLivePhotos';
 import { AnimatePresence, motion } from 'motion/react';
 import {
   aiInsightPresetIdsForAnchorPreset,
@@ -1503,6 +1503,13 @@ export function MapArea({
   const [regionPickVersion, setRegionPickVersion] = useState(0);
   const [livePhotosOpen, setLivePhotosOpen] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
+  /** 지도 핀용 spot_report 새로고침 카운터 — 제보 완료 시 증가 */
+  const [spotPinRefreshKey, setSpotPinRefreshKey] = useState(0);
+  /** 제보 완료 콜백: 지도 핀 즉시 갱신 + 부모(포인트 재조회 등) */
+  const handleReportSubmitted = useCallback(() => {
+    setSpotPinRefreshKey((k) => k + 1);
+    onReportSubmitted?.();
+  }, [onReportSubmitted]);
   /** 소화기 긴급 조회 시트 */
   const [fireExtOpen, setFireExtOpen] = useState(false);
   /** 취약계층 도움 안내 시트 */
@@ -1700,6 +1707,22 @@ export function MapArea({
     simOn,
     myLocation,
   ]);
+
+  /** 지도 위 spot_report 핀 — 항상 로드(모달 닫혀도), 제보 완료 시 갱신 */
+  const nearbySpotPins = useNearbyLivePhotos(
+    livePhotoFeedEnabled && isActive && !simOn ? livePhotoMapCenter : null,
+    NEARBY_LIVE_PHOTOS_RADIUS_KM,
+    !!(livePhotoFeedEnabled && isActive && !simOn),
+    spotPinRefreshKey,
+  );
+
+  /** spot_report 지도 핀 아이콘 */
+  const spotPinIcon = useMemo(() => L.divIcon({
+    className: 'spotvibe-spot-pin-icon',
+    html: `<div style="width:28px;height:28px;border-radius:50% 50% 50% 0;background:rgba(192,132,252,0.92);border:2px solid rgba(255,255,255,0.7);transform:rotate(-45deg);box-shadow:0 2px 8px rgba(192,132,252,0.55)"></div>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 28],
+  }), []);
 
   /** SOS·부모: DB 동기와 별개로 지도에 찍힌 내 좌표 전달(실시간 홀드 포함) */
   useEffect(() => {
@@ -2705,6 +2728,19 @@ export function MapArea({
             />
           );
         })}
+
+        {/* ── 실제 모드: 근처 현장 제보 핀 (verified, 최근 2시간) ── */}
+        {!simOn && nearbySpotPins.map((pin) => (
+          <Marker
+            key={`spot-pin-${pin.id}`}
+            position={[pin.lat, pin.lng]}
+            icon={spotPinIcon}
+            zIndexOffset={200}
+            eventHandlers={{
+              click: () => setLivePhotosOpen(true),
+            }}
+          />
+        ))}
 
         {simOn && eventMarkersShifted.map((ev) => (
           <Marker
@@ -3759,18 +3795,18 @@ export function MapArea({
         radiusKm={NEARBY_LIVE_PHOTOS_RADIUS_KM}
         enabled={livePhotoFeedEnabled && isActive}
         isAdmin={isAdmin}
-        onModeration={onReportSubmitted}
+        onModeration={handleReportSubmitted}
       />
       <PhotoGallerySheet
         open={galleryOpen}
         onClose={() => setGalleryOpen(false)}
         isAdmin={isAdmin}
-        onModeration={onReportSubmitted}
+        onModeration={handleReportSubmitted}
       />
       {!mapMinimalChrome && (
         <SpotReportUpload
           fabVariant="mapToolbar"
-          onReportSubmitted={onReportSubmitted}
+          onReportSubmitted={handleReportSubmitted}
           virtualReportLatLng={simOn ? ADMIN_MAP_TEST_VIRTUAL_LAT_LNG : null}
           isAdmin={isAdmin}
           adminReportFallbackLatLng={{ lat: exploreCenter[0], lng: exploreCenter[1] }}

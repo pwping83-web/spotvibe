@@ -784,26 +784,30 @@ export function SpotReportUpload({
         ? 'held'
         : 'pending';
 
+    const insertPayload: Record<string, unknown> = {
+      user_id: userId,
+      photo_url: photoUrl,
+      lat,
+      lng,
+      status: insertStatus,
+      place_name: titleTrim,
+      description: description.trim() || null,
+      ai_reason:
+        SKIP_AUTOVERIFY_RPC
+          ? '테스트: 자동 verified'
+          : textDecision === 'held'
+            ? (textReason.trim() || 'AI 텍스트 검토 보류')
+            : null,
+      ai_label: SKIP_AUTOVERIFY_RPC ? '현장 제보' : null,
+      ai_category: SKIP_AUTOVERIFY_RPC ? 'other' : null,
+    };
+    // user_category 컬럼은 마이그레이션(20260518130000) 적용 후에만 존재
+    // 선택한 경우에만 포함 → 미적용 DB에서도 null 삽입 에러 없이 동작
+    if (userCategory) insertPayload.user_category = userCategory;
+
     const { data: report, error: insertError } = await sb
       .from('spot_reports')
-      .insert({
-        user_id: userId,
-        photo_url: photoUrl,
-        lat,
-        lng,
-        status: insertStatus,
-        place_name: titleTrim,
-        description: description.trim() || null,
-        user_category: userCategory || null,
-        ai_reason:
-          SKIP_AUTOVERIFY_RPC
-            ? '테스트: 자동 verified'
-            : textDecision === 'held'
-              ? (textReason.trim() || 'AI 텍스트 검토 보류')
-              : null,
-        ai_label: SKIP_AUTOVERIFY_RPC ? '현장 제보' : null,
-        ai_category: SKIP_AUTOVERIFY_RPC ? 'other' : null,
-      })
+      .insert(insertPayload)
       .select('id')
       .single();
 
