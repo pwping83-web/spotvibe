@@ -8,6 +8,16 @@
         "--project-ref",
         "lowyhlkwpmxseoeefgpm"
       ]
+    },
+    "figma": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@figma/mcp-server"
+      ],
+      "env": {
+        "FIGMA_ACCESS_TOKEN": "여기에_토큰_붙여넣기"
+      }
     }
   }
 }

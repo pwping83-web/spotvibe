@@ -49,3 +49,6 @@ Thumbs.db
 
 # Supabase local temp
 supabase/.temp
+
+# MCP 설정 (토큰 포함 — git 제외)
+.cursor/mcp.json
